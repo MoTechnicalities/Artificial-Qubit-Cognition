@@ -1,6 +1,6 @@
-mod geom;
-
-use geom::qubit_calculator::{CalculatorQubit, GeometricAddOperator, GeometricSubOperator};
+use artificial_qubit_cognition::geom::qubit_calculator::{
+    CalculatorQubit, GeometricAddOperator, GeometricSubOperator,
+};
 
 fn main() {
     // Deterministic 0.1 + 0.2 verification
