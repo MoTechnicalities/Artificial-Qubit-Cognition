@@ -8,6 +8,30 @@ This document is organized from primitives to full cognition. Sections 1-4 defin
 
 Readers interested primarily in theory should begin with Sections 2, 3, and 11. Readers interested in end-to-end execution should begin with Sections 10 and 12, then return to the earlier sections for the formal substrate.
 
+## Runnable Qubit Calculator Demo
+
+This repository includes a minimal Rust calculator that implements deterministic geometric add/subtract operations on a single qubit-style register using fixed-point scaling (`1_000_000 = 1.0`).
+
+Run it locally:
+
+```bash
+cargo run
+```
+
+Expected core output includes the deterministic verification:
+
+```text
+Initial Register Value: 0.0
+After Adding 0.1:        0.1
+Final Result (0.1 + 0.2): 0.3
+```
+
+Run tests:
+
+```bash
+cargo test
+```
+
 ## Notation & Conventions
 
 The document uses a small, stable notation set so that the same objects can be tracked across all phases:
