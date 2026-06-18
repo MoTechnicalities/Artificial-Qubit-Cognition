@@ -297,7 +297,7 @@ Unless stated otherwise, all computations are discrete, integer-safe, and replay
 | Algebra | Operator families, composition rules, commutation structure | Deterministic transform language |
 | Functional Layers | Measurement, resonance, arbitration, correction | Deterministic judgment functionals |
 | Artifact Layer | Canonical signatures and auditable records | Replay-stable cognitive evidence |
-| Implementation Mapping | Optional realization in engines such as GORT | Practical execution without changing the theory |
+| Implementation Mapping | Optional realization in engines such as GORT (Geometric Operator-Regulated Thought) | Practical execution without changing the theory |
 
 ## Mathematical Foundations
 
@@ -656,7 +656,7 @@ Together, these invariants transform Artificial-Qubit-Cognition from a theoretic
 
 ## Appendix A. Optional Implementation Mapping (GORT)
 
-Artificial-Qubit-Cognition is the primary theory. GORT is one implementation of that theory. This appendix is intentionally optional and exists only to show one practical realization.
+Artificial-Qubit-Cognition is the primary theory. GORT (Geometric Operator-Regulated Thought) is one implementation of that theory. This appendix is intentionally optional and exists only to show one practical realization.
 
 Where this repository specifies what the cognition system is, GORT specifies how one runtime executes it.
 
