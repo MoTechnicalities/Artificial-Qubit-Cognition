@@ -587,13 +587,13 @@ $$
 with fixed integer coefficients and invariant-preserving terms. The selected candidate is:
 
 $$
-c^* = \arg\max_{c \in C} A_c.
+c^{*} = \arg\max_{c \in C} A_c.
 $$
 
 Then apply deterministic correction functional:
 
 $$
-T^*_{\mathrm{stable}} = \mathrm{Correct}(T_{c^*}).
+T^{*}_{\mathrm{stable}} = \mathrm{Correct}(T_{c^{*}}).
 $$
 
 The result is a composition artifact: a complete, replay-stable record of the cognitive process, including:
