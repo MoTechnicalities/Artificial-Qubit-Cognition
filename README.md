@@ -36,6 +36,35 @@ To prevent category errors, AQC is explicitly not:
 
 AQC is a deterministic geometric cognition theory: it defines objects, invariants, algebras, and functionals that implementations may realize.
 
+## Primitive Cognitive Distinctions
+
+Cognition begins with distinctions. Before concepts, before relations, and before inference, a cognitive system must be able to differentiate. Artificial-Qubit-Cognition treats these irreducible differences as primitive cognitive distinctions: the smallest deterministic semantic contrasts that can be encoded as governed geometric states and transformed by invariant-preserving operators.
+
+A primitive cognitive distinction is not a fact, proposition, or belief. It is a minimal semantic polarity: a stable, replay-deterministic difference that can participate in geometric thought.
+
+Examples of primitive distinctions include:
+
+- Self / NotSelf - boundary of agency
+- Known / Unknown - boundary of epistemic stability
+- Safe / Unsafe - boundary of threat assessment
+- Equal / Different - boundary of comparison
+- Possible / Impossible - boundary of closure
+
+Each distinction corresponds to:
+
+- a canonical geometric state in $U \subseteq \mathbb{Z}^3$
+- a governed operator family that transforms it
+- a signature that certifies its identity
+- a closure constraint ensuring invariant-preserving evolution
+
+These distinctions form the semantic alphabet of AQC. Higher-order cognition, including binding, relational geometry, hierarchical composition, and parallel trajectory families, emerges from lawful transformations of these primitives.
+
+Under this interpretation, an artificial qubit can be read as:
+
+> the smallest deterministic cognitive distinction capable of participating in governed geometric reasoning.
+
+This reframes AQC not as an alternative quantum model or symbolic logic system, but as a systematic attempt to identify the minimal semantic units of cognition and the lawful operators required to make them think.
+
 ## Reader's Guide
 
 This document is organized from ontology to algebra to cognitive functionals.
