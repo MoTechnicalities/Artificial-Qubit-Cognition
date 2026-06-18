@@ -149,6 +149,102 @@ cargo test
 
 The important point is that both the semantic label and the signature transition are deterministic and replay-stable.
 
+## Scaling AQs: What Becomes Possible
+
+There is a significant structural difference between single-AQ, double-AQ, and multi-AQ cognition.
+
+| AQ Count | New Structural Power | Cognitive Phenomena Enabled |
+| --- | --- | --- |
+| 1 AQ | Isolated state + governed operators | Single-concept evolution and projection |
+| 2 AQs | Composite bindings and pairwise coherence | Relational reasoning, contrast, alignment tracking |
+| 3-4 AQs | Triadic and small-group composites | Context-sensitive judgment over multi-factor scenarios |
+| 5+ AQs | Rich trajectory families and hierarchical composition | Multi-candidate arbitration, stable long-horizon context |
+
+Key idea: scaling AQs does not just add memory, it adds governed relational geometry. This enables deterministic cognition over interacting concepts rather than isolated state updates.
+
+## Governed Relational Geometry
+
+Multi-AQ systems form governed relational geometries: structured networks where states are nodes, bindings are invariant-constrained edges, and operator histories encode lawful transformations of meaning.
+
+At this level, AQC can be read as a graph-theoretic cognition substrate:
+
+- states define local geometric identity
+- bindings define relational structure
+- operators transform local and relational geometry
+- trajectories trace paths through the meaning graph
+- signatures certify every transition in replay-stable form
+
+This is the conceptual shift from isolated arithmetic state updates to deterministic relational cognition.
+
+## Hierarchical Binding and Super-AQs
+
+Bindings are compositional. A governed composite can itself be treated as a higher-order atomic unit for subsequent operator action.
+
+Formally, if a binding map produces composite objects
+
+$$
+B : \mathcal{S} \times \mathcal{S} \to \mathcal{B},
+$$
+
+then governed compositions over $\mathcal{B}$ can be lifted into a higher-order state space $\mathcal{S}^{(1)}$ (informally, super-AQs), enabling nested cognition layers.
+
+Practical consequences:
+
+- local concepts aggregate into mid-level composites
+- composites can be reasoned over as single cognitive units
+- abstraction depth increases without abandoning determinism
+- long-horizon reasoning remains auditable via layered signatures
+
+## Parallel Trajectory Families
+
+AQC natively supports parallel trajectory families: multiple candidate trajectories evolving under the same governed algebra and invariant contract.
+
+Given a candidate set $\mathcal{C}$, each candidate induces a trajectory $T_c$ and a functional evaluation chain. These trajectories need not be interpreted as a single sequential path; they are a family of concurrent reasoning hypotheses over a shared semantic substrate.
+
+This enables:
+
+- deterministic multi-candidate planning
+- structured comparison of competing interpretations
+- scenario and debate-style reasoning without stochastic sampling
+- stable arbitration and correction over full candidate families
+
+The key property is that parallelism increases expressiveness while preserving closure, determinism, and auditability.
+
+## 3-AQ Deterministic Relational Reasoner Demo
+
+This demo is an easy-to-construct but significantly more expressive example than the calculators. It demonstrates how three AQs can represent:
+
+- agent orientation
+- action candidate geometry
+- context/value constraints
+
+and then evaluate multiple plans using deterministic operator evolution and governed arbitration.
+
+### What it demonstrates
+
+- triadic relational reasoning (Agent-Action-Context)
+- multi-candidate evaluation
+- deterministic scoring and winner selection
+- correction-aware, signature-tracked decision output
+
+### How to run it
+
+```bash
+cargo run --bin three_aq_reasoner
+```
+
+Expected output pattern includes:
+
+- per-plan labels and scores (`Aligned`, `Risky`, `Rejected`)
+- plan signatures with operator and correction trace
+- deterministic winner and tournament signature
+
+Run all tests:
+
+```bash
+cargo test
+```
+
 ## Notation & Conventions
 
 The document uses a small, stable notation set so that the same objects can be tracked across the full stack:
