@@ -468,7 +468,7 @@ By grounding interpretation in discrete geometry and canonical signatures, seman
 ## 7. Resonance Inference: Field-Modulated Judgment
 
 $$
-R : F(\mathcal{T}) \to \mathbb{Z}, \quad T' = \operatorname{ResonanceAdjust}(T)
+R : F(\mathcal{T}) \to \mathbb{Z}, \quad T' = \mathrm{ResonanceAdjust}(T)
 $$
 
 Semantic measurement classifies what a trajectory is, but cognition also requires a mechanism for determining what a trajectory means in context. Resonance inference provides this layer. It introduces a deterministic influence field that modulates how trajectories are interpreted, weighted, and ultimately judged. Unlike probabilistic inference or energy-minimization schemes, resonance in Artificial-Qubit-Cognition is a purely governed, integer-safe reweighting of canonical features.
@@ -486,7 +486,7 @@ Resonance does not alter the trajectory itself. It alters the interpretive gravi
 The resonance-modulated interpretation of a trajectory is itself a deterministic object:
 
 $$
-T' = \operatorname{ResonanceAdjust}(T),
+T' = \mathrm{ResonanceAdjust}(T),
 $$
 
 where $T'$ carries the same geometric evolution as $T$ but with an updated semantic weighting. This produces an inference trajectory, a conceptual path that reflects both the raw operator-driven evolution and the system's governed interpretive biases.
@@ -498,7 +498,7 @@ By introducing resonance, Artificial-Qubit-Cognition gains the ability to perfor
 ## 8. Arbitration: Deterministic Decision Functional
 
 $$
-A : \mathcal{T} \to \mathbb{Z}, \quad T_{\mathrm{winner}} = \operatorname*{arg\,max}_{T_i \in \mathcal{C}} A(T_i)
+A : \mathcal{T} \to \mathbb{Z}, \quad T_{\mathrm{winner}} = \arg\max_{T_i \in \mathcal{C}} A(T_i)
 $$
 
 Resonance inference provides a contextual weighting of trajectories, but cognition requires more than weighted interpretation. It requires choice. When multiple inference trajectories are available, the system must select a single winner in a way that is deterministic, auditable, and invariant-preserving. Arbitration is the governed decision functional that performs this selection.
@@ -529,7 +529,7 @@ where $R(T_i)$ is the resonance score, $S(M(T_i))$ is the semantic label score, 
 Arbitration then selects the winner via a simple, replay-stable rule:
 
 $$
-T_{\mathrm{winner}} = \operatorname*{arg\,max}_i A(T_i).
+T_{\mathrm{winner}} = \arg\max_i A(T_i).
 $$
 
 Because all components, features, weights, signatures, and scoring functions, are discrete and governed, arbitration is fully deterministic. Any deviation in operator order, binding structure, or semantic classification produces a different trajectory signature and therefore a different arbitration result, making drift or corruption immediately detectable.
@@ -572,10 +572,10 @@ A single trajectory can express a line of reasoning, but cognition rarely operat
 Let $C$ be a finite set of candidates. For each $c \in C$, define:
 
 $$
-\vec{s}_c = \operatorname{State}(c), \quad
-T_c = \operatorname{Trajectory}(\vec{s}_c), \quad
-M_c = \operatorname{Measure}(T_c), \quad
-R_c = \operatorname{Resonance}(F(T_c)).
+\vec{s}_c = \mathrm{State}(c), \quad
+T_c = \mathrm{Trajectory}(\vec{s}_c), \quad
+M_c = \mathrm{Measure}(T_c), \quad
+R_c = \mathrm{Resonance}(F(T_c)).
 $$
 
 Define governed arbitration score:
@@ -587,13 +587,13 @@ $$
 with fixed integer coefficients and invariant-preserving terms. The selected candidate is:
 
 $$
-c^* = \operatorname*{arg\,max}_{c \in C} A_c.
+c^* = \arg\max_{c \in C} A_c.
 $$
 
 Then apply deterministic correction functional:
 
 $$
-T^*_\text{stable} = \operatorname{Correct}(T_{c^*}).
+T^*_{\mathrm{stable}} = \mathrm{Correct}(T_{c^*}).
 $$
 
 The result is a composition artifact: a complete, replay-stable record of the cognitive process, including:
