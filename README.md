@@ -24,15 +24,29 @@ The architecture is built from:
 - Trajectory
 - Closure
 
+## What AQC Is Not
+
+To prevent category errors, AQC is explicitly not:
+
+- quantum mechanics
+- a physical qubit simulator
+- a neural-network architecture
+- a probabilistic cognition model
+- a runtime pipeline specification
+
+AQC is a deterministic geometric cognition theory: it defines objects, invariants, algebras, and functionals that implementations may realize.
+
 ## Reader's Guide
 
 This document is organized from ontology to algebra to cognitive functionals.
 
-Readers interested primarily in theory should begin with Sections 1, 3, and 11. Readers interested in runnable demonstrations should begin with the two calculator demos, then return to Sections 2-10.
+Readers interested in the formal substrate should begin with Sections 1, 2, 3, and 11. Readers focused on cognitive functionals should then read Sections 6-10. The calculator sections are illustrative appendices for discrete arithmetic intuition, not the definition of AQC.
 
-## Runnable Qubit Calculator Demo
+## Illustrative Qubit Arithmetic Demo (Not an AQC Implementation)
 
-This repository includes a minimal Rust calculator that implements deterministic geometric add/subtract operations on a single qubit-style register using fixed-point scaling (`1_000_000 = 1.0`).
+This repository includes a minimal Rust calculator that illustrates deterministic fixed-point add/subtract operations on a single qubit-style register using scaling (`1_000_000 = 1.0`).
+
+This demo is not the AQC theory, not a cognition engine, and not a qubit simulator in the physical sense. It is a compact illustration of integer-safe geometric state updates.
 
 Run it locally:
 
@@ -54,9 +68,11 @@ Run tests:
 cargo test
 ```
 
-## Runnable Double-Qubit Calculator Demo
+## Illustrative Double-Qubit Arithmetic Demo (Not an AQC Implementation)
 
-The repository also includes a more structured two-qubit demo that keeps a four-state register in fixed-point form.
+The repository also includes a more structured two-qubit arithmetic illustration that keeps a four-state register in fixed-point form.
+
+As above, this is a pedagogical artifact for deterministic geometric arithmetic, not a full implementation of AQC ontology, algebra, and cognitive functionals.
 
 Run it with:
 
@@ -65,6 +81,73 @@ cargo run --bin double_qubit_calculator
 ```
 
 The binary prints the register before and after the deterministic superposition and controlled rotation steps.
+
+## Deterministic Semantic Comparator Demo
+
+This demo is the smallest AQC-native reasoning example in the repository.
+
+### What it is
+
+The comparator is a deterministic semantic relation engine over discrete geometric states. Given two semantic states and two governed operator sequences, it computes:
+
+- each candidate trajectory
+- each canonical trajectory signature
+- a semantic relation label (`Reinforcement`, `Alignment`, `Contrast`, or `Conflict`)
+- a deterministic relation signature derived from both trajectories and the resulting label
+
+Unlike embedding similarity or probabilistic scoring, this demo uses only integer geometry, governed operators, and fixed semantic measurement rules.
+
+### How it functions
+
+For each candidate pair, the comparator executes the following functional chain:
+
+- state construction in integer geometry
+- governed operator application
+- trajectory signature generation
+- semantic measurement to a stable label
+
+In code terms, the flow is:
+
+1. Build `SemanticState` values in `\mathbb{Z}^3`
+2. Apply `GovernedOperator` sequences to produce `SemanticTrajectory`
+3. Measure relation by deterministic geometry (`dot`-style relation test)
+4. Emit `ComparisonResult` with a canonical relation signature
+
+### How to run it
+
+Run it with:
+
+```bash
+cargo run --bin semantic_comparator
+```
+
+The demo compares `DOG` and `WOLF` twice:
+
+- baseline relation with no operator intervention
+- transformed relation after applying `Contrast` to one candidate
+
+Expected pattern:
+
+- baseline label: `Reinforcement`
+- post-operator label: `Contrast`
+
+Typical output pattern:
+
+```text
+Deterministic Semantic Comparator
+SemanticRelation(DOG, WOLF) baseline = Reinforcement
+Baseline signature: relation:Reinforcement|...
+SemanticRelation(DOG, WOLF) after Contrast = Contrast
+Contrast signature: relation:Contrast|...
+```
+
+Run the full test suite (including comparator tests) with:
+
+```bash
+cargo test
+```
+
+The important point is that both the semantic label and the signature transition are deterministic and replay-stable.
 
 ## Notation & Conventions
 
@@ -87,9 +170,26 @@ Unless stated otherwise, all computations are discrete, integer-safe, and replay
 | --- | --- | --- |
 | Ontology | State, geometry, operator, binding, trajectory, closure | Precise objects and invariants |
 | Algebra | Operator families, composition rules, commutation structure | Deterministic transform language |
-| Functional Layers | Measurement, resonance, arbitration, correction | Deterministic judgment pipeline |
+| Functional Layers | Measurement, resonance, arbitration, correction | Deterministic judgment functionals |
 | Artifact Layer | Canonical signatures and auditable records | Replay-stable cognitive evidence |
 | Implementation Mapping | Optional realization in engines such as GORT | Practical execution without changing the theory |
+
+## Mathematical Foundations
+
+The formal substrate of AQC can be summarized as a compact object-and-map system:
+
+- Discrete state space: $\mathcal{S} \subseteq \mathbb{Z}^n$
+- Governed unit set: $U \subseteq \mathcal{S}$
+- Operator family: $\mathcal{O} \subseteq \{O : \mathcal{S} \to \mathcal{S}\}$ with governed commutation and closure constraints
+- Binding construction: $B : \mathcal{S} \times \mathcal{S} \to \mathcal{B}$
+- Trajectory space: $\mathcal{T}$ generated by ordered operator application over states and bindings
+- Canonical signature map: $\Sigma : (\mathcal{S} \cup \mathcal{B} \cup \mathcal{T}) \to \mathcal{K}$
+
+Core requirements:
+
+- closure: governed transforms remain within domain constraints
+- determinism: identical inputs yield identical outputs
+- auditability: signatures provide replay-stable identity over structure and history
 
 ## 1. Introduction: Ontology Before Implementation
 
@@ -143,10 +243,11 @@ In this framework, an artificial qubit is not a quantum object but a governed ge
 
 ## 3. Artificial Operators: Non-Commuting Governance
 
-If discrete geometric states are the atoms of cognition, then operators are the laws of motion that govern how those states evolve. In Artificial-Qubit-Cognition, operators are defined as integer-safe linear transformations over the discrete state space $\mathbb{Z}^3$. They play the same structural role as quantum gates on a qubit, but with two critical differences:
+If discrete geometric states are the atoms of cognition, then operators are the laws of motion that govern how those states evolve. In Artificial-Qubit-Cognition, operators are integer-safe linear maps over the discrete state space $\mathbb{Z}^3$ with a governed commutation structure.
 
 1. They operate entirely in integer arithmetic, ensuring byte-stable replay.
-2. They form a governed algebra, where non-commutation is not a quantum artifact but a deliberate cognitive design principle.
+2. They preserve governed state membership in $U$ under normalization.
+3. Their non-commutation structure is explicit and invariant-constrained.
 
 This makes the artificial operator, not the qubit analogy alone, the active cognitive primitive. States persist, but thought is expressed as a governed trajectory through state space under deterministic operator action.
 
@@ -180,11 +281,11 @@ $$
 
 the order of application matters. This asymmetry is what allows trajectories to encode history, context, and semantic differentiation. In a deterministic cognition system, non-commutation is not a nuisance. It is the mechanism by which meaning emerges.
 
-To support this, the operator algebra includes:
+To support this, the operator algebra includes governed operator families such as:
 
-- Pauli-like generators $(X, Z)$ for axis flips and sign inversions
-- Clifford-like transformations for controlled rotations and basis changes
-- Mixed families that introduce structured asymmetry without leaving integer space
+- axis inversion maps for sign and orientation changes
+- basis change maps for controlled coordinate transformations
+- mixed non-commuting families that introduce structured asymmetry while remaining in integer space
 
 Each operator family carries a canonical signature, and the full commutation table is treated as a governed artifact. These signatures allow the system to detect drift, validate invariants, and ensure that operator application remains stable across compilers, architectures, and time.
 
@@ -234,19 +335,15 @@ Trajectories fall into several deterministic categories:
 
 Each step in a trajectory carries a step signature, and the full trajectory carries a trajectory signature, a canonical, replay-stable identifier derived from the sequence of operators, states, and binding classifications. These signatures form a merkle-like chain that guarantees auditability: any deviation in operator order, binding structure, or normalization produces a different signature, making drift immediately detectable.
 
-For implementation purposes, a trajectory should also be understood as an auditable cognitive record, not merely a symbolic tuple. A minimal `ThoughtTrajectory` envelope carries fields such as:
-
-- origin
-- operators_applied
-- bindings_crossed
-- closure_status
-- audit_history
-
-Later layers append interpretation-specific fields, such as resonance weighting, arbitration score, and correction status, but the core requirement is stable: a thought trajectory must remain a replay-stable record of how cognition moved through governed state geometry.
+Concrete data-schema fields for trajectory records are implementation notes and are intentionally separated into Appendix B. At the theory layer, the requirement is stable: a thought trajectory must remain a replay-stable record of how cognition moved through governed state geometry.
 
 Thought trajectories are the first point in the cognition stack where temporal structure appears. They encode not only what the system is thinking, but how it arrived there. This temporal geometry becomes the substrate for semantic measurement, resonance inference, arbitration, and self-correction. In this way, trajectories transform artificial qubits from static geometric primitives into deterministic, interpretable paths of thought.
 
 ## 6. Semantic Measurement: Projection to Interpretation
+
+$$
+M : \mathcal{T} \to \mathcal{L}, \quad M(T) = \ell
+$$
 
 Thought trajectories encode the evolution of discrete geometric states under governed operator sequences, but cognition requires more than motion through state space. It requires interpretation, a way to project the structure of a trajectory onto a stable semantic surface. Semantic measurement is the deterministic mechanism that performs this projection, converting geometric and operator-level behavior into meaningful cognitive labels.
 
@@ -274,6 +371,10 @@ By grounding interpretation in discrete geometry and canonical signatures, seman
 
 ## 7. Resonance Inference: Field-Modulated Judgment
 
+$$
+R : F(\mathcal{T}) \to \mathbb{Z}, \quad T' = \operatorname{ResonanceAdjust}(T)
+$$
+
 Semantic measurement classifies what a trajectory is, but cognition also requires a mechanism for determining what a trajectory means in context. Resonance inference provides this layer. It introduces a deterministic influence field that modulates how trajectories are interpreted, weighted, and ultimately judged. Unlike probabilistic inference or energy-minimization schemes, resonance in Artificial-Qubit-Cognition is a purely governed, integer-safe reweighting of canonical features.
 
 A resonance field is a structured mapping
@@ -298,11 +399,15 @@ Resonance inference is the first point in the cognition stack where the system e
 
 By introducing resonance, Artificial-Qubit-Cognition gains the ability to perform context-sensitive reasoning while remaining fully governed. This prepares the ground for arbitration, where multiple inference trajectories compete under the influence of resonance-derived scores to produce a single, stable cognitive decision.
 
-## 8. Arbitration: Multi-Candidate Reasoning
+## 8. Arbitration: Deterministic Decision Functional
 
-Resonance inference provides a contextual weighting of trajectories, but cognition requires more than weighted interpretation. It requires choice. When multiple inference trajectories compete to explain, reinforce, or resolve a cognitive situation, the system must select a single winner in a way that is deterministic, auditable, and invariant-preserving. Arbitration is the governed mechanism that performs this selection.
+$$
+A : \mathcal{T} \to \mathbb{Z}, \quad T_{\mathrm{winner}} = \operatorname*{arg\,max}_{T_i \in \mathcal{C}} A(T_i)
+$$
 
-In Artificial-Qubit-Cognition, arbitration is not a search algorithm, not a probabilistic sampler, and not an optimization loop. It is a deterministic tournament over a finite set of candidate trajectories, each carrying:
+Resonance inference provides a contextual weighting of trajectories, but cognition requires more than weighted interpretation. It requires choice. When multiple inference trajectories are available, the system must select a single winner in a way that is deterministic, auditable, and invariant-preserving. Arbitration is the governed decision functional that performs this selection.
+
+In Artificial-Qubit-Cognition, arbitration is not a search algorithm, not a probabilistic sampler, and not an optimization loop. It is a deterministic decision functional over a finite set of candidate trajectories, each carrying:
 
 - a geometric evolution
 - a semantic measurement
@@ -339,6 +444,10 @@ This prepares the ground for self-correction, where the chosen trajectory is sub
 
 ## 9. Self-Correction: Drift Detection & Stabilization
 
+$$
+C_{\mathrm{corr}} : \mathcal{T} \to \mathcal{T}, \quad T_{\mathrm{stable}} = C_{\mathrm{corr}}(T_{\mathrm{winner}})
+$$
+
 Arbitration selects a single winning trajectory, but a decision is only as reliable as the stability of the reasoning that produced it. Even in a fully discrete, integer-safe cognition system, operator sequences can accumulate structural tension: semantic divergence, binding instability, conflicting operator signatures, or violations of the invariant contract. The self-correction layer introduces the governed mechanism that detects and repairs these forms of drift.
 
 Self-correction begins with drift detection, a deterministic evaluation of the winning trajectory's canonical signatures. The system examines:
@@ -360,30 +469,38 @@ A correction plan is itself a trajectory, carrying its own canonical signature a
 
 Self-correction is the final safeguard in the cognition stack. It ensures that the system's output is not merely the best candidate among several, but a structurally sound decision whose reasoning chain has been validated, repaired, and stabilized. With this layer, Artificial-Qubit-Cognition becomes a self-maintaining cognitive architecture, capable of sustaining coherent reasoning across long horizons without drift, randomness, or loss of auditability.
 
-## 10. Cognitive Tournament: The Full Stack in Action
+## 10. Layer Composition: Deterministic Cognitive Functional
 
-A single trajectory can express a line of reasoning, but cognition rarely operates in isolation. Real reasoning requires competition, multiple candidate interpretations, multiple possible evolutions, multiple semantic framings, all evaluated under a unified governance contract. The cognitive tournament is the mechanism that integrates the full deterministic stack into a single pipeline capable of multi-candidate reasoning, arbitration, and stabilization.
+A single trajectory can express a line of reasoning, but cognition rarely operates in isolation. Real reasoning requires candidate comparison under invariant-preserving functionals. In AQC, layer composition is defined mathematically as functional composition over a finite candidate set, not as a runtime loop primitive.
 
-A tournament begins with a set of candidate plans, each encoded as an initial binding and operator sequence. These plans represent alternative interpretations, hypotheses, or reasoning paths. The system evaluates each plan independently through the full cognition stack:
+Let $C$ be a finite set of candidates. For each $c \in C$, define:
 
-1. State Construction  
-Canonical discrete geometric states are constructed for each plan.
-2. Operator Evolution  
-Each plan evolves through its operator sequence, generating a deterministic trajectory.
-3. Binding Formation  
-Multi-state relationships emerge as operators act on composite structures.
-4. Trajectory Construction  
-Each plan produces a complete, signature-tracked thought trajectory.
-5. Semantic Measurement  
-Trajectories are projected onto semantic surfaces, producing interpretable labels.
-6. Resonance Inference  
-Semantic labels and trajectory features are reweighted through deterministic influence fields.
-7. Arbitration  
-All inference trajectories compete under governed scoring rules; a single winner is selected.
-8. Self-Correction  
-The winning trajectory is validated, repaired, and stabilized to eliminate drift.
+$$
+\vec{s}_c = \operatorname{State}(c), \quad
+T_c = \operatorname{Trajectory}(\vec{s}_c), \quad
+M_c = \operatorname{Measure}(T_c), \quad
+R_c = \operatorname{Resonance}(F(T_c)).
+$$
 
-The result is a tournament artifact: a complete, replay-stable record of the cognitive process, including:
+Define governed arbitration score:
+
+$$
+A_c = \alpha R_c + \beta S(M_c) + \gamma C_c,
+$$
+
+with fixed integer coefficients and invariant-preserving terms. The selected candidate is:
+
+$$
+c^* = \operatorname*{arg\,max}_{c \in C} A_c.
+$$
+
+Then apply deterministic correction functional:
+
+$$
+T^*_\text{stable} = \operatorname{Correct}(T_{c^*}).
+$$
+
+The result is a composition artifact: a complete, replay-stable record of the cognitive process, including:
 
 - the winning plan
 - its semantic label
@@ -396,7 +513,7 @@ The result is a tournament artifact: a complete, replay-stable record of the cog
 
 This artifact is not a log. It is a governed cognitive object, a deterministic summary of the system's reasoning. Any deviation in operator order, binding structure, semantic classification, or resonance weighting produces a different canonical signature, making the entire process auditable and drift-detectable.
 
-The cognitive tournament is the first point where Artificial-Qubit-Cognition behaves like a complete cognitive system. It evaluates alternatives, interprets them, judges them, corrects them, and produces a single stable decision, all without randomness, floating-point drift, or heuristic shortcuts. It is the operational realization of the theory developed in Sections 1-9.
+This layer composition should be read as a compositional mathematical object over candidates. It does not define a required runtime order; it defines invariant-preserving relations among state construction, measurement, resonance, arbitration, and correction.
 
 ## 11. Determinism & Governance: The Invariant Contract
 
@@ -432,6 +549,20 @@ GORT maps the theory through:
 This mapping is exact at the invariant level: every signature rule, operator constraint, and semantic classification described here is enforced at runtime by GORT's schemas, gauntlet tests, and governance gates.
 
 This division of labor ensures that cognition remains both principled and executable. Artificial-Qubit-Cognition provides the mathematical and architectural clarity needed to reason about the system, while GORT provides the deterministic machinery needed to run it. Together, they form a unified cognitive framework: theory and implementation, specification and execution, invariants and enforcement.
+
+## Appendix B. Implementation Notes: Trajectory Record Envelope
+
+This appendix records one implementation-oriented data envelope for trajectory artifacts. It is provided for implementers and is not part of the core ontology.
+
+A minimal `ThoughtTrajectory` record may include fields such as:
+
+- origin
+- operators_applied
+- bindings_crossed
+- closure_status
+- audit_history
+
+Implementations may append interpretation-specific fields such as resonance weighting, arbitration score, and correction status, provided canonical signatures and invariant checks remain intact.
 
 ## Non-Goals
 
@@ -493,7 +624,7 @@ These ideas inform the invariant contract and the canonical signature system.
 - Multi-candidate evaluation frameworks
 - Deterministic alternatives to probabilistic cognitive models
 
-These works provide historical context for the tournament-based reasoning pipeline.
+These works provide historical context for tournament-based reasoning formalisms.
 
 ### Quantum-Inspired Models (Structural, Not Physical)
 
@@ -526,26 +657,26 @@ The result is a cognition model that is:
 - Self-maintaining - drift is detected and repaired automatically
 - Extensible - open problems invite further exploration without compromising invariants
 
-Artificial-Qubit-Cognition is intentionally modular. Each layer stands alone as a governed subsystem, yet all layers interlock to form a coherent cognitive pipeline. This modularity ensures that future extensions, new operator families, higher-order bindings, adaptive semantic surfaces, and multi-agent tournaments, can be introduced without violating the invariant contract.
+Artificial-Qubit-Cognition is intentionally modular. Each layer stands alone as a governed subsystem, yet all layers interlock to form a coherent cognitive stack. This modularity ensures that future extensions, new operator families, higher-order bindings, adaptive semantic surfaces, and multi-agent tournaments, can be introduced without violating the invariant contract.
 
-As the field of deterministic cognition evolves, this repository serves as both a reference architecture and a research platform. It documents the principles, structures, and constraints required to build cognition that is not merely powerful, but trustworthy. The work here is complete enough to run, yet open enough to grow, a foundation for the next generation of governed cognitive systems.
+As the field of deterministic cognition evolves, this repository serves as both a reference architecture and a research platform. It documents the principles, structures, and constraints required to build cognition that is not merely powerful, but trustworthy. The work here is complete enough to analyze, yet open enough to grow, a foundation for the next generation of governed cognitive systems.
 
 ## Minimal End-to-End Example
 
-The following compressed example illustrates how a single tournament candidate moves through the stack without requiring implementation detail.
+The following compressed example illustrates how a single candidate is transformed through the composed layers without requiring implementation detail.
 
 Start with a structured candidate plan such as: move forward, turn left, advance three units. State construction maps the plan into canonical discrete states in $\mathbb{Z}^3$. Operator evolution maps each step into governed operators whose order matters. Binding construction maps the resulting states into a composite relation. Trajectory construction turns the ordered operator history into a trajectory with step signatures and a trajectory signature.
 
 Semantic measurement projects that trajectory onto semantic surfaces and emits a label, for example Reinforcement or Alignment. Resonance inference evaluates the same trajectory under a resonance field and produces an inference trajectory with contextual weighting. Arbitration compares that inference trajectory against competing candidates and selects a winner under a chosen meta-operator. Self-correction validates the winning path for drift and, when needed, applies a deterministic correction plan that yields a stabilized decision.
 
-The resulting tournament artifact includes at minimum a winner identity, semantic label, arbitration signature, correction signature, stabilization signature, and per-candidate trajectory signatures. The important point is not the surface wording of the plan, but that every transition from state construction to stabilized judgment remains canonical, governed, and replay-stable.
+The resulting composition artifact includes at minimum a winner identity, semantic label, arbitration signature, correction signature, stabilization signature, and per-candidate trajectory signatures. The important point is not the surface wording of the plan, but that every transition from state construction to stabilized judgment remains canonical, governed, and replay-stable.
 
 ## Cognition Glossary
 
 ### A
 
-- Guided Link: [Arbitration](#8-arbitration--multi-candidate-reasoning)  
-Arbitration is the deterministic tournament layer that selects a single winning inference trajectory using governed scoring rules and meta-operators such as StabilityFirst and SemanticCoherenceFirst.
+- Guided Link: [Arbitration](#8-arbitration-deterministic-decision-functional)  
+Arbitration is the deterministic decision functional that selects a single winning inference trajectory using governed scoring rules and meta-operators such as StabilityFirst and SemanticCoherenceFirst.
 - Guided Link: [Artificial Qubit](#2-artificial-qubits--discrete-geometric-states)  
 An artificial qubit is a discrete geometric state in $\mathbb{Z}^3$ that behaves structurally like a qubit but is fully deterministic, integer-safe, and replay-stable.
 - Guided Link: [Auditability](#11-determinism--governance--the-invariant-contract)  
@@ -564,8 +695,8 @@ A binding signature is the canonical identifier for a binding, encoding constitu
 A canonical signature is a merkle-like deterministic identifier derived from the structure and history of a cognitive object, such as a state, operator, binding, or trajectory.
 - Guided Link: [Closure](#11-determinism--governance--the-invariant-contract)  
 Closure is the invariant that all cognitive operations must remain within the governed algebra; no operator or binding may produce an out-of-domain state.
-- Guided Link: [Cognitive Tournament](#10-cognitive-tournament--the-full-stack-in-action)  
-A cognitive tournament is the full multi-candidate reasoning pipeline that evaluates, measures, weighs, arbitrates, and stabilizes competing plans.
+- Guided Link: [Layer Composition](#10-layer-composition-deterministic-cognitive-functional)  
+Layer composition is the multi-candidate functional composition that evaluates, measures, weighs, arbitrates, and stabilizes competing plans.
 - Guided Link: [Correction Plan](#9-self-correction--drift-detection--stabilization)  
 A correction plan is a deterministic sequence of repair operators applied to stabilize a winning trajectory.
 
@@ -606,13 +737,13 @@ The invariant contract is the set of four governing invariants: Determinism, Con
 
 - Guided Link: [Measurement Surface](#6-semantic-measurement--projection-to-interpretation)  
 A measurement surface is the deterministic classification rule set that maps trajectory features to semantic labels.
-- Guided Link: [Meta-Operator](#8-arbitration--multi-candidate-reasoning)  
+- Guided Link: [Meta-Operator](#8-arbitration-deterministic-decision-functional)  
 A meta-operator is a higher-order scoring rule used in arbitration, for example StabilityFirst or ConflictResolver.
 
 ### O
 
 - Guided Link: [Operator](#3-artificial-operators--non-commuting-governance)  
-An operator is an integer-safe linear transformation in $\mathbb{Z}^3$ that evolves states and bindings; it includes Pauli-like and Clifford-like families.
+An operator is an integer-safe linear transformation in $\mathbb{Z}^3$ that evolves states and bindings under governed commutation and invariant-preserving constraints.
 - Guided Link: [Operator Signature](#3-artificial-operators--non-commuting-governance)  
 An operator signature is the canonical identifier for an operator, encoding its algebraic role and commutation behavior.
 
