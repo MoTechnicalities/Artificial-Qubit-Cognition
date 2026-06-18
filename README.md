@@ -1,5 +1,9 @@
 # Artificial-Qubit-Cognition
 
+<p align="center">
+	<img src="assets/images/AQC_hero.png" alt="Artificial Qubit Cognition Hero" width="100%" />
+</p>
+
 Artificial-Qubit-Cognition is a standalone mathematical and conceptual framework for deterministic cognition. It explains how minimal geometric states, invariant-preserving operators, auditable trajectories, and closure rules compose into lawful reasoning without probability, collapse, or floating-point drift.
 
 ## Philosophical Preface
