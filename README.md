@@ -593,7 +593,7 @@ $$
 Then apply deterministic correction functional:
 
 $$
-T^{*}_{\mathrm{stable}} = \mathrm{Correct}\left(T_{c^{*}}\right).
+T^{*}_{\mathrm{stable}} = {\mathrm{Correct}\left(T_{c^{*}}\right)}.
 $$
 
 The result is a composition artifact: a complete, replay-stable record of the cognitive process, including:
