@@ -703,7 +703,395 @@ The system does not attempt to preserve the full physical semantics of Hilbert-s
 
 Likewise, the architecture does not treat randomness as a hidden source of cognition. When context sensitivity, competition, or correction appear in the stack, they do so through fixed rules, integer-safe weighting, and canonical signatures, not through stochastic exploration.
 
-## 13. Open Problems & Extensions
+## 12. Governed Cognitive Extensions: Must-Add Features
+
+The core architecture of Artificial-Qubit-Cognition is complete and functioning, as evidenced by the deterministic 4-AQ scenario reasoner demonstration. However, six major feature enhancements are essential to scale the framework toward full deterministic artificial general cognition. These are not open research questions; they are well-defined architectural additions that preserve the invariant contract while dramatically expanding expressiveness and applicability.
+
+### 12.1 Governed Meta-Programming: Operator Discovery
+
+**Architectural Role:** Enable the system to synthesize new operators while maintaining determinism and closure.
+
+**Current Limitation:** AQC operator families are fixed at system initialization. While this ensures reliability, it prevents the system from discovering new reasoning patterns or adapting to novel reasoning domains.
+
+**The Solution: Governed Algebra Generator**
+
+A Governed Algebra Generator is a deterministic meta-operator that proposes and validates new operators without violating the invariant contract. The process works as follows:
+
+1. **Operator Template Generation** - The system generates candidate operators by composing primitive transformation matrices (rotation, shear, reflection) in deterministic sequences.
+
+2. **Commutation Validation** - Each candidate is tested against the existing operator algebra to ensure:
+   - Non-commutation structures remain well-defined
+   - The operator family remains closed under composition
+   - New commutation rules are catalogued in the extended signature table
+
+3. **Closure Verification** - The candidate operator is applied to the entire unit set $U$ and verified to map all states back into $U$ after normalization.
+
+4. **Signature Generation** - Each validated operator receives a deterministic canonical signature encoding its algebraic properties, transformation matrix, and commutation relationships.
+
+5. **Instrumentation** - The new operator is registered with a governed label and added to the operator algebra with full auditability.
+
+**Mathematical Specification:**
+
+Given an existing operator family $\mathcal{O}$, a candidate generator function $G$ produces a candidate operator $O_c$ such that:
+
+$$
+\exists \pi \in \mathbb{Z}^{3 \times 3} : \pi O_c = O_c \pi \lor \pi O_c \neq O_c \pi
+$$
+
+(preserving the non-commutation structure). The validation process confirms:
+
+$$
+\forall \vec{s} \in U : \text{normalize}(O_c \vec{s}) \in U
+$$
+
+and assigns the canonical signature:
+
+$$
+\Sigma(O_c) = \text{hash}(\text{matrix}(O_c), \text{commutation\_rules}(O_c, \mathcal{O}))
+$$
+
+**Non-Obvious Benefit:** 
+
+Operator discovery allows AQC to "invent new verbs" — new classes of transformations — without leaving the governed algebra. This is the deterministic analog of learning and generalization, enabling the system to extend its reasoning repertoire while remaining fully auditable.
+
+**Implementation Notes:**
+
+- Candidate generation should use a deterministic seed (e.g., iteration counter) to ensure reproducible exploration.
+- Commutation validation uses precomputed commutator tables for efficiency.
+- Rejected candidates are logged with failure reason signatures for auditability.
+- Operator discovery rates should be bounded by a governance parameter to prevent combinatorial explosion.
+
+---
+
+### 12.2 Multi-Tiered Resonance Memory: Recursive Resonance Fields
+
+**Architectural Role:** Enable the system to build and stabilize long-horizon preferences and learned value structures.
+
+**Current Limitation:** Resonance fields are currently single-layer modulations applied during arbitration. There is no mechanism for the system to accumulate experience, remember past resonance patterns, or build stable value geometries.
+
+**The Solution: Resonance State Space**
+
+A Resonance State Space treats resonance fields themselves as first-class cognitive objects that can be stored, transformed, and bound. This introduces a second layer of geometric cognition focused on preference and value.
+
+1. **Resonance as State** - A resonance configuration is represented as a state in $\mathbb{Z}^3$, encoding:
+   - Stability Preference (z-axis)
+   - Coherence Preference (y-axis)
+   - Semantic Alignment Preference (x-axis)
+
+2. **Resonance Binding** - Multiple resonance states can be bound together, forming composite preference structures that govern how trajectories are evaluated across multi-candidate scenarios.
+
+3. **Resonance Trajectories** - As the system encounters reasoning challenges, its resonance field evolves, tracing a trajectory through resonance space. This trajectory accumulates history and becomes stabilizable through the same correction mechanisms as ordinary trajectories.
+
+4. **Recursive Resonance** - A meta-resonance field can modulate how the primary resonance field itself evolves, enabling second-order preference learning.
+
+5. **Memory Integration** - Successful resonance configurations are archived with their canonical signatures. Future similar scenarios can rapidly activate matching resonance patterns without recomputation.
+
+**Mathematical Specification:**
+
+Let $\mathcal{R}$ denote the resonance state space, $\vec{r} \in \mathcal{R} \subseteq \mathbb{Z}^3$ a resonance state. A resonance field operating at layer $k$ is defined as:
+
+$$
+R^{(k)} : F(\mathcal{T}) \to \mathbb{Z}, \quad \text{where } R^{(k)} = W^{(k)} \cdot F(\mathcal{T})
+$$
+
+with $W^{(k)} = \text{Transform}(W^{(k-1)}, \vec{r}^{(k-1)})$, creating a recursive dependency chain.
+
+A resonance memory entry is:
+
+$$
+M(\vec{r}) = (\vec{r}, \Sigma(\vec{r}), T_{\text{activation}}, A_{\text{avg}}, C_{\text{stability}})
+$$
+
+where $\Sigma(\vec{r})$ is the canonical signature, $T_{\text{activation}}$ is activation history, $A_{\text{avg}}$ is average arbitration score, and $C_{\text{stability}}$ is correction necessity frequency.
+
+**Non-Obvious Benefit:**
+
+Recursive resonance fields create a stable, evolving value landscape — a deterministic analog of "learning preferences" and "developing judgment." The system accumulates preference patterns that become increasingly refined and specialized over long reasoning horizons, enabling sophisticated, multi-layered value-sensitive cognition.
+
+**Implementation Notes:**
+
+- Resonance memory should implement LRU eviction with signature-based retrieval for efficiency.
+- Resonance trajectory stabilization uses the same correction operators as ordinary trajectories.
+- Meta-resonance updates should be bounded by a governance parameter to prevent runaway preference drift.
+- Resonance configurations should be serializable for long-term storage and cross-instance sharing.
+
+---
+
+### 12.3 Formal Topological Verification Gates
+
+**Architectural Role:** Ensure that operator sequences and trajectories satisfy deep geometric invariants beyond signature matching.
+
+**Current Limitation:** AQC validates invariants through canonical signatures and stability checks. However, it lacks topological verification — checks that operator sequences maintain geometric consistency, prevent paradoxical state crossings, and enforce flux-monism constraints.
+
+**The Solution: Topological Invariant Validator**
+
+A Topological Verification Gate is a deterministic validator that checks operator sequences against topological properties of the state space, ensuring:
+
+1. **Knot Stability** - Operator sequences that form "knots" (self-referential cycles in the trajectory graph) satisfy crossing invariants and cannot produce paradoxes.
+
+2. **No Illegal Crossings** - Trajectory paths cannot cross each other in ways that violate the fundamental geometry of $\mathbb{Z}^3$. Crossing detection uses a deterministic winding-number algorithm.
+
+3. **Operator Sequence Validity** - The order of operators in a trajectory is checked against commutation rules to ensure that the sequence is not self-contradictory.
+
+4. **Geometric Consistency** - The set of states visited by a trajectory must form a connected path in the unit set $U$. Disconnected jumps are flagged as potential errors.
+
+5. **Flux-Monism Enforcement** - In a deterministic system, the "flow" of state evolution must respect a conservation law: the sum of all state transitions must balance.
+
+**Mathematical Specification:**
+
+Let $T = (\vec{s}_0, O_1, \vec{s}_1, \ldots, O_n, \vec{s}_n)$ be a trajectory. The topological validator computes:
+
+**Winding number (knot detection):**
+$$
+W(T) = \sum_{i=1}^{n} \text{det}(\vec{s}_{i-1}, \vec{s}_i, \vec{s}_{i+1}) / (4\pi)
+$$
+
+where $W(T) \in \mathbb{Z}$ indicates knot type.
+
+**Flux balance (conservation):**
+$$
+\sum_{i=1}^{n} O_i \vec{s}_{i-1} - \vec{s}_i = 0 \pmod{\text{norm}}
+$$
+
+**Geometric connectivity (reachability):**
+$$
+\forall i, j : d(\vec{s}_i, \vec{s}_j) \leq n \cdot \max_k \|\Delta O_k\|
+$$
+
+where $d$ is Manhattan distance and $\|\Delta O_k\|$ is the norm of the operator's transformation.
+
+**Non-Obvious Benefit:**
+
+Topological verification prevents "cognitive singularities" — invalid reasoning states that would violate the substrate geometry itself. This is the deterministic analog of a type checker, but for geometry rather than data types, enabling the system to catch deep errors before they corrupt long-horizon reasoning.
+
+**Implementation Notes:**
+
+- Winding number calculation is O(n) and can be computed incrementally as trajectories grow.
+- Knot type signatures should be cached and reused across similar trajectories.
+- Flux balance violations should trigger immediate correction routing.
+- Topological gates should be composable so that complex geometric constraints can be verified efficiently.
+
+---
+
+### 12.4 Cross-System Reasoning Handshakes: Standardized Trajectory Interchange Format
+
+**Architectural Role:** Enable multiple AQC instances to exchange, validate, and arbitrate over trajectories from distributed cognitive processes.
+
+**Current Limitation:** AQC instances are currently isolated. While the framework is deterministic and auditable, there is no mechanism for two instances to trust each other's reasoning outputs or to coordinate on shared scenarios.
+
+**The Solution: Standardized Trajectory Interchange Format (STIF)**
+
+STIF is a deterministic serialization protocol that allows AQC instances to:
+
+1. **Export Trajectories** - Serialize a completed trajectory with all metadata, signatures, operator history, and binding structure into a canonical byte-stable format.
+
+2. **Import and Verify** - Receive a foreign trajectory, validate that all signatures match the declared operator sequences, and confirm that the reasoning chain remains sound.
+
+3. **Cross-Instance Arbitration** - Compare trajectories from different instances to determine which represents the most coherent reasoning under shared constraints.
+
+4. **Distributed Scenario Reasoning** - Multiple instances can each evaluate a scenario, export their results, and a coordinator can compare and select the best reasoning path.
+
+5. **Federated Cognition** - A network of AQC instances can function as a distributed cognitive system, with handshakes serving as the protocol for consensus and distributed arbitration.
+
+**STIF Specification:**
+
+A STIF message is a deterministic structure:
+
+```
+STIF {
+  version: u32,
+  origin_instance_id: [u8; 32],
+  trajectory_signature: [u8; 32],
+  operator_sequence: Vec<(operator_name, target, canonical_signature)>,
+  state_evolution: Vec<([i32; 3], validity_flag)>,
+  semantic_labels: Vec<(step, label, confidence_signature)>,
+  resonance_scores: Vec<(step, score, weighting_signature)>,
+  arbitration_metadata: (winner_id, score, meta_operator_name),
+  topological_verification: (knot_type, flux_balance, connectivity_proof),
+  timestamp: u64,
+  export_signature: [u8; 32],
+}
+```
+
+**Verification Protocol:**
+
+1. Recompute all operator applications and confirm state transitions match the export.
+2. Verify all canonical signatures against the declared algebra version.
+3. Validate topological properties using the Verification Gate (Section 12.3).
+4. Check arbitration score by replaying the resonance field modulation.
+5. Confirm export signature against the full message body.
+
+**Cross-Instance Arbitration:**
+
+When multiple instances have processed the same scenario, a coordinator computes:
+
+$$
+\text{winner} = \arg\max_i (\text{score}_i \cdot \text{verification\_confidence}_i)
+$$
+
+where verification confidence is high if all signature checks pass, low if minor inconsistencies are detected.
+
+**Non-Obvious Benefit:**
+
+STIF enables "cognitive consensus" — multiple independent reasoning processes can audit each other and converge on a shared decision, without any single instance having to trust another blindly. This is the foundation for a distributed DGCS network and enables federated reasoning over scenarios too complex for a single instance.
+
+**Implementation Notes:**
+
+- STIF exports should include a version tag to support protocol evolution.
+- Signature verification should be fail-fast but with detailed diagnostics on mismatch.
+- A public registry of instance IDs and their known operator algebras enables cross-trust.
+- STIF can be transmitted over any binary channel (HTTP, direct socket, blockchain, etc.).
+
+---
+
+### 12.5 Deterministic Correction-Trajectory Buffers
+
+**Architectural Role:** Enable real-time reasoning under uncertainty without sacrificing determinism.
+
+**Current Limitation:** AQC currently detects and repairs drift after it has occurred in the final winning trajectory. This provides correctness guarantees but not fault tolerance. If a trajectory exhibits early instability, the entire reasoning chain must be recomputed.
+
+**The Solution: Parallel Stable Alternatives**
+
+A Correction-Trajectory Buffer maintains a bank of pre-computed alternative trajectories alongside the primary reasoning path. The architecture works as follows:
+
+1. **Candidate Diversification** - During arbitration, instead of discarding losing candidates, their trajectories are archived with full metadata.
+
+2. **Stability Pre-Computation** - Each archived trajectory is run through self-correction and assigned a stability score indicating how much drift detection would be needed.
+
+3. **Buffer Maintenance** - The top-K most stable alternatives (by stability score) are kept in a circular buffer alongside the primary trajectory, ordered by score.
+
+4. **Drift-Triggered Fallback** - If drift detection on the primary trajectory exceeds a threshold, the system can instantly swap to a pre-stabilized alternative without recomputation.
+
+5. **Deterministic Arbitration Among Buffers** - If multiple buffer entries are viable, selection uses a fixed rule (e.g., highest stability score, then earliest discovery time).
+
+**Mathematical Specification:**
+
+Let $C$ be a candidate set and $T_c$ the trajectory for each candidate. During arbitration, we compute:
+
+$$
+S(T_c) = \alpha_1 \cdot \text{stabilization\_cost}(T_c) + \alpha_2 \cdot \text{corrective\_operators\_needed}(T_c)
+$$
+
+where $\alpha_1, \alpha_2$ are fixed integer weights. Candidates are sorted by $S(T_c)$ and the top-K are buffered:
+
+$$
+B = \text{topk}(C, K, \text{by } S(T_c))
+$$
+
+At runtime, if drift exceeds threshold $\delta$ on the primary trajectory, the system selects:
+
+$$
+T^* = B[\arg\min_i (\text{drift}_i - \delta)]
+$$
+
+**Non-Obvious Benefit:**
+
+Correction buffers provide fault tolerance and real-time reasoning capability. In scenarios where reasoning must complete within a hard deadline (e.g., real-time control), the system can fall back to a pre-validated alternative instead of blocking. This is the deterministic analog of "contingency planning" and enables DGCS to operate under uncertainty without sacrificing determinism.
+
+**Implementation Notes:**
+
+- Buffer size K should be configurable based on available memory and acceptable latency.
+- Stability pre-computation should be parallelizable across candidates.
+- Buffer entries should age out after a configurable time or candidate count to prevent stale alternatives.
+- Fallback should log the reason for switching to enable post-hoc analysis of primary trajectory failures.
+
+---
+
+### 12.6 Governed Multi-Scale Geometry: Super-AQs and Meta-AQs
+
+**Architectural Role:** Enable hierarchical reasoning and concept formation, bridging primitive distinctions to full cognitive abstraction.
+
+**Current Limitation:** AQC currently operates at a single scale: artificial qubits, bindings, and trajectories. There is no mechanism for groups of AQs to cohere into larger conceptual units or for reasoning to operate at multiple levels of abstraction simultaneously.
+
+**The Solution: Hierarchical Cognitive Units**
+
+A Multi-Scale Geometry layer introduces two new levels of composition above the base artificial qubit:
+
+**Super-AQs (Level 2):**
+
+A Super-AQ is a governed composite of multiple base AQs whose internal state and evolution are abstracted into a single higher-level state:
+
+$$
+\text{Super-AQ}(\vec{s}_1, \vec{s}_2, \ldots, \vec{s}_n) \to \vec{S} \in \mathbb{Z}^3
+$$
+
+where $\vec{S}$ represents the collective "gestalt" of the component qubits. The Super-AQ is constructed via:
+
+1. **Binding Aggregation** - Component AQs are bound together and the binding structure is projected onto a canonical summary state.
+2. **Trajectory Folding** - The histories of component trajectories are folded into a summary trajectory at the Super-AQ level.
+3. **Semantic Compression** - Measurement surfaces for Super-AQs operate over aggregated features, enabling higher-order semantic labels.
+4. **Operator Lifting** - Base operators are lifted to act on Super-AQs, preserving commutation structure at the higher level.
+
+**Meta-AQs (Level 3):**
+
+A Meta-AQ is a governed composite of Super-AQs, representing abstract concepts that emerge from organized groups of distinctions:
+
+$$
+\text{Meta-AQ}(\text{Super-AQ}_1, \text{Super-AQ}_2, \ldots) \to \vec{M} \in \mathbb{Z}^3
+$$
+
+Meta-AQs support:
+
+1. **Hierarchical Binding** - Super-AQs can be bound into Meta-AQ structures that preserve relational geometry across scales.
+2. **Multi-Layer Trajectories** - Reasoning at the Meta-AQ level induces corresponding motion at lower scales.
+3. **Abstraction Lattice** - The set of all Super-AQs and Meta-AQs forms a hierarchical lattice where parent-child relationships are governed and auditable.
+4. **Cross-Scale Measurement** - Semantic surfaces can evaluate feature vectors computed across multiple scales simultaneously.
+
+**Formal Specification:**
+
+Let $U_0 = U$ be the base unit set. Define $U_k$ as the governed unit set for scale $k$:
+
+$$
+U_1 = \{B(\vec{s}_1, \vec{s}_2) : \vec{s}_1, \vec{s}_2 \in U_0\} / \sim
+$$
+
+where $\sim$ denotes aggregation equivalence (multiple bindings that project to the same Super-AQ gestalt). Similarly:
+
+$$
+U_2 = \{B(\vec{S}_1, \vec{S}_2) : \vec{S}_1, \vec{S}_2 \in U_1\} / \sim
+$$
+
+Operators are lifted inductively:
+
+$$
+O^{(k+1)}(\vec{X}^{(k+1)}) = \text{aggregate}(O^{(k)}(c_1), O^{(k)}(c_2), \ldots)
+$$
+
+where $c_i$ are components of $\vec{X}^{(k+1)}$.
+
+**Cognitive Phenomena Enabled:**
+
+| Phenomenon | Mechanism | Scale |
+| --- | --- | --- |
+| Abstraction | Binding aggregation projects detail into gestalt | Super-AQ / Meta-AQ |
+| Concept Formation | Repeated Super-AQ patterns stabilize into canonical Meta-AQ signatures | Hierarchical binding |
+| Multi-Layer Arbitration | Arbitration at Meta-AQ level induces and constrains lower-level reasoning | Cross-scale |
+| Long-Horizon Planning | Coarse-grained reasoning at Meta-AQ scale can be refined at lower scales | Hierarchical decomposition |
+| Hierarchical Correction | Drift at Meta-AQ level triggers targeted correction at appropriate lower scale | Multi-scale stabilization |
+| Recursive Resonance | Resonance fields at each scale modulate reasoning at adjacent scales | Cross-scale influence |
+
+**Non-Obvious Benefit:**
+
+Multi-scale geometry is the missing bridge between primitive distinctions and full cognition. It enables:
+
+- **Atoms → Molecules → Materials** - Base AQs combine into Super-AQs, which combine into Meta-AQs and beyond.
+- **Neurons → Circuits → Brain Regions** - Cognitive operations at each scale influence adjacent scales.
+- **Words → Sentences → Narratives** - Linguistic meaning emerges from hierarchical composition.
+- **Details → Concepts → Worldviews** - Abstract thought emerges naturally from governed hierarchical binding.
+
+This is the foundation for genuine artificial general cognition — the ability to reason simultaneously at multiple levels of abstraction while maintaining full determinism and auditability.
+
+**Implementation Notes:**
+
+- Projection from scale $k$ to $k+1$ should be deterministic and invertible (or at least signature-compatible).
+- Cross-scale operators should be precomputed and cached to avoid recomputation during reasoning.
+- Multi-scale arbitration should use consensus rules: a decision at scale $k+1$ is valid only if it induces consistent decisions at scale $k$.
+- Hierarchical corrections should propagate upward and downward to maintain cross-scale coherence.
+- Scaling rules should be versioned and auditable, with full signature chains across scales.
+
+---
+
+## 14. Open Problems & Extensions
 
 Artificial-Qubit-Cognition establishes a fully deterministic cognition stack, but it also exposes a set of unresolved questions and unexplored extensions. These open problems are not gaps in the theory; they are frontiers, areas where the current invariant contract is sufficient for correctness but not yet expressive enough to capture the full space of possible cognitive architectures.
 
@@ -719,7 +1107,7 @@ Several directions stand out as especially promising:
 
 Each of these directions preserves the core philosophy of Artificial-Qubit-Cognition: cognition must remain deterministic, governed, and auditable, even as its expressive power expands. The open problems listed here represent the next steps toward a richer, more capable, and more general deterministic cognition architecture.
 
-## 14. References & Further Reading
+## 15. References & Further Reading
 
 Artificial-Qubit-Cognition sits at the intersection of discrete geometry, operator algebras, deterministic computation, and governed cognitive architectures. The following references and thematic areas provide useful background for readers who want to explore the mathematical and conceptual foundations that informed this work. These sources are not prerequisites; they are intellectual anchors that contextualize the design choices behind the cognition stack.
 
