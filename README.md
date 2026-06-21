@@ -280,6 +280,108 @@ cargo test
 
 ## Notation & Conventions
 
+## Reusable DGCS Substrate
+
+Three core modules that every DGCS reasoner shares now live in `src/geom/` as reusable infrastructure:
+
+| Module | Exported Types | Role |
+| --- | --- | --- |
+| `geom::topology_gate` | `TopologyStatus` | Shared outcome type for all topological invariant gates |
+| `geom::resonance_field` | `ResonanceField`, `ResonanceScore` | Resonance field state in $\mathbb{Z}^3$ and decomposed scoring struct |
+| `geom::correction_buffer` | `CorrectionBuffer` | Pre-stabilised fallback archive for drift-triggered instant recovery |
+
+Domain-specific reasoning modules supply their own `check_topology()` and `evaluate_resonance()` functions in a local `evaluation.rs`. The substrate types and the scoring formula `score = stability + symmetry - drift + coherence` are shared unchanged across all domains.
+
+## Bridge-Builder Reasoner: Canonical Super-AQ Reference
+
+The Bridge-Builder Reasoner (BBR) is the reference implementation of multi-scale AQC cognition. It demonstrates all six DGCS layers — primitive AQs, super-AQs, meta-AQs, three operator levels, topological invariant gate, and resonance-modulated arbitration — and is the model every future DGCS reasoner should be compared against.
+
+### Design Notes
+
+**Why `[drift, symmetry, stability]` axes?**
+
+Each primitive AQ encodes three semantic dimensions as integer coordinates in $\mathbb{Z}^3$:
+
+- `coords[0]` — drift axis: contribution to structural deviation from baseline
+- `coords[1]` — symmetry axis: left-right balance contribution (measured across span meta-AQs only)
+- `coords[2]` — stability axis: structural load capacity
+
+This encoding produces the three key resonance metrics as pure integer sums — no thresholds, no heuristics, no floating point. The scoring formula `score = stability + symmetry - drift + coherence` is a single deterministic linear functional over the primitive coordinate space.
+
+**How topology gating works**
+
+Before any trajectory is accepted, the Topological Invariant Validator checks:
+
+- Whether any span section (LeftSpan or RightSpan) contains a `Disconnected` primitive — producing an **unsupported span** violation
+- Whether any single structural component contains two or more `Unstable` primitives — producing an **unstable joint** violation
+
+A rejected design triggers the correction buffer, which holds pre-validated fallback trajectories for instant recovery without recomputation.
+
+**How `DistributeLoad` adds coherence**
+
+The `DistributeLoad` meta-operator contributes a deterministic `+6` structural coherence bonus — the governance-specified consequence of applying a load redistribution transformation across the bridge's meta-AQ sections. Coherence bonuses allow the scoring functional to reward globally sound structural choices even when local stability is only moderate.
+
+### How to run it
+
+```bash
+cargo run --bin bridge_builder
+```
+
+Expected output:
+
+```text
+Bridge-Builder Reasoner Demo
+--------------------------------
+Evaluating Design A...   Stability: 32  Symmetry: 18  Drift: 4   Topology: Valid  Score: 46
+Evaluating Design B...   Stability: 41  Symmetry: 22  Drift: 1   Topology: Valid  Score: 62
+Evaluating Design C...   Stability: 28  Symmetry: 10  Drift: 7   Topology: Invalid (unsupported span)  Score: Rejected
+Evaluating Design D...   Stability: 35  Symmetry: 12  Drift: 3   Topology: Valid  Score: 50
+Winner: Design B
+Tournament Signature: bridge:metaAQ|winner:B|A:46|B:62|C:invalid|D:50
+```
+
+See [DGCS_SPEC.md](DGCS_SPEC.md) for the full substrate specification.
+
+## Power Grid Reasoner: Same Substrate, Different Ontology
+
+The Power Grid Reasoner applies the identical DGCS substrate to multi-zone electrical grid routing. It uses the same `geom::topology_gate`, `geom::resonance_field`, and `geom::correction_buffer` — but a completely different ontology:
+
+| Scale | Types |
+| --- | --- |
+| Primitive AQs | Energized, DeEnergized, Overloaded, Nominal, Connected, Isolated, Protected, Unprotected, Standby, Idle |
+| Super-AQs | Circuit, Breaker, Load, Line |
+| Meta-AQs | NorthZone (active), CentralSubstation, SouthZone (active) |
+
+The topology gate rejects any plan with an `Isolated` circuit node in an active zone or an overload cascade. `ShedLoad` contributes the `+6` coherence bonus. This demo proves the substrate is domain-independent:
+
+> Change the ontology. Keep the substrate.
+
+### How to run it
+
+```bash
+cargo run --bin power_grid_reasoner
+```
+
+Expected output:
+
+```text
+Power Grid Reasoner Demo
+--------------------------------
+Evaluating Routing Plan A...  Stability: 30  Symmetry: 16  Drift: 5  Topology: Valid  Score: 41
+Evaluating Routing Plan B...  Stability: 39  Symmetry: 20  Drift: 2  Topology: Valid  Score: 57
+Evaluating Routing Plan C...  Stability: 25  Symmetry: 12  Drift: 8  Topology: Invalid (isolated circuit node)  Score: Rejected
+Evaluating Routing Plan D...  Stability: 33  Symmetry: 14  Drift: 3  Topology: Valid  Score: 50
+Winner: Routing Plan B
+Tournament Signature: grid:metaAQ|winner:B|A:41|B:57|C:invalid|D:50
+```
+
+Run all tests:
+
+```bash
+cargo test
+```
+
+
 The document uses a small, stable notation set so that the same objects can be tracked across the full stack:
 
 - $\vec{s} \in \mathbb{Z}^3$ denotes a discrete geometric state

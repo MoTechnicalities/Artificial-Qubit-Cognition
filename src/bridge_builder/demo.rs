@@ -1,11 +1,11 @@
 use crate::bridge_builder::{
     arbitration::{run_tournament, BridgeDesign, Tournament},
-    correction_buffer::CorrectionBuffer,
     meta_aq::{MetaAQ, MetaAQKind},
     operators::meta_ops::MetaOp,
     primitive_aq::{PrimitiveAQ, PrimitiveAQKind},
     super_aq::{SuperAQ, SuperAQKind},
 };
+use crate::geom::correction_buffer::CorrectionBuffer;
 
 use MetaAQKind::*;
 use PrimitiveAQKind::*;

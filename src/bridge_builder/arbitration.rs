@@ -1,9 +1,12 @@
 use crate::bridge_builder::{
-    correction_buffer::CorrectionBuffer,
+    evaluation::{check_topology, evaluate_resonance},
     meta_aq::MetaAQ,
     operators::meta_ops::MetaOp,
-    resonance_field::{evaluate, ResonanceField},
-    topology_gate::{check_topology, TopologyStatus},
+};
+use crate::geom::{
+    correction_buffer::CorrectionBuffer,
+    resonance_field::ResonanceField,
+    topology_gate::TopologyStatus,
 };
 
 /// Score variant for a design result.
@@ -96,7 +99,7 @@ fn evaluate_design(
     buffer: &mut CorrectionBuffer,
 ) -> DesignResult {
     let topology = check_topology(&design.meta_aqs);
-    let scores = evaluate(field, &design.meta_aqs, &design.meta_ops);
+    let scores = evaluate_resonance(field, &design.meta_aqs, &design.meta_ops);
 
     let (score, signature) = if topology.is_valid() {
         let total = scores.total_score();

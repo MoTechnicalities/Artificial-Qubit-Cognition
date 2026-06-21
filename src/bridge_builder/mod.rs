@@ -1,12 +1,10 @@
 pub mod arbitration;
-pub mod correction_buffer;
 pub mod demo;
+pub mod evaluation;
 pub mod meta_aq;
 pub mod operators;
 pub mod primitive_aq;
-pub mod resonance_field;
 pub mod super_aq;
-pub mod topology_gate;
 
 #[cfg(test)]
 mod tests {
