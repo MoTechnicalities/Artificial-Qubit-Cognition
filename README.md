@@ -40,6 +40,23 @@ To prevent category errors, AQC is explicitly not:
 
 AQC is a deterministic geometric cognition theory: it defines objects, invariants, algebras, and functionals that implementations may realize.
 
+## DGCS Philosophy
+
+Deterministic Geometric Cognition Substrate (DGCS) is not symbolic logic, neural-network inference, probabilistic search, or quantum simulation. It is a different computational identity:
+
+> deterministic geometric cognition.
+
+In DGCS, cognition is modeled as lawful motion through discrete geometric state spaces, not as token rewriting, stochastic sampling, or gradient descent. Meaning is carried by governed states, transformed by invariant-preserving operators, evaluated by deterministic functionals, and certified by canonical signatures.
+
+This gives DGCS four core commitments:
+
+- **Determinism**: identical inputs produce identical outputs.
+- **Geometric semantics**: concepts and relations are represented as structured geometry in $\mathbb{Z}^n$.
+- **Governance**: operators, bindings, and trajectories are constrained by explicit invariants.
+- **Auditability**: each transition is replay-stable and signature-verifiable.
+
+DGCS should therefore be read as a substrate for computable, verifiable cognition: a system where interpretation is produced by lawful structure rather than probability.
+
 ## Primitive Cognitive Distinctions
 
 Cognition begins with distinctions. Before concepts, before relations, and before inference, a cognitive system must be able to differentiate. Artificial-Qubit-Cognition treats these irreducible differences as primitive cognitive distinctions: the smallest deterministic semantic contrasts that can be encoded as governed geometric states and transformed by invariant-preserving operators.
