@@ -1,3 +1,4 @@
+pub mod bridge_builder;
 pub mod geom;
 pub mod thought_trajectory;
 
