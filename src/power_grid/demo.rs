@@ -17,6 +17,7 @@ fn paq(kind: PrimitiveAQKind) -> PrimitiveAQ {
 
 fn super_aq(kind: SuperAQKind, ks: &[PrimitiveAQKind]) -> SuperAQ {
     SuperAQ::new(kind, ks.iter().map(|&k| paq(k)).collect())
+        .expect("canonical grid super-AQ coordinates must be in range")
 }
 
 fn meta_aq(kind: MetaAQKind, parts: &[(SuperAQKind, &[PrimitiveAQKind])]) -> MetaAQ {
@@ -24,6 +25,7 @@ fn meta_aq(kind: MetaAQKind, parts: &[(SuperAQKind, &[PrimitiveAQKind])]) -> Met
         kind,
         parts.iter().map(|&(sk, ps)| super_aq(sk, ps)).collect(),
     )
+    .expect("canonical grid meta-AQ coordinates must be in range")
 }
 
 // ── Routing Plan A: Standard Routing ─────────────────────────────────────
@@ -59,18 +61,24 @@ fn plan_a() -> GridDesign {
     GridDesign {
         id: "A".to_string(),
         meta_aqs: vec![
-            meta_aq(NorthZone, &[
-                (Circuit, &[Protected, Connected]),
-                (Breaker, &[Nominal, Standby]),
-            ]),
-            meta_aq(CentralSubstation, &[
-                (Load, &[Nominal, Overloaded]),
-                (Line, &[Idle, Idle]),
-            ]),
-            meta_aq(SouthZone, &[
-                (Circuit, &[Protected, Connected]),
-                (Breaker, &[Nominal, Standby]),
-            ]),
+            meta_aq(
+                NorthZone,
+                &[
+                    (Circuit, &[Protected, Connected]),
+                    (Breaker, &[Nominal, Standby]),
+                ],
+            ),
+            meta_aq(
+                CentralSubstation,
+                &[(Load, &[Nominal, Overloaded]), (Line, &[Idle, Idle])],
+            ),
+            meta_aq(
+                SouthZone,
+                &[
+                    (Circuit, &[Protected, Connected]),
+                    (Breaker, &[Nominal, Standby]),
+                ],
+            ),
         ],
         meta_ops: vec![MetaOp::BalanceZones],
     }
@@ -95,18 +103,27 @@ fn plan_b() -> GridDesign {
     GridDesign {
         id: "B".to_string(),
         meta_aqs: vec![
-            meta_aq(NorthZone, &[
-                (Circuit, &[Energized, Protected]),
-                (Breaker, &[Nominal, Connected]),
-            ]),
-            meta_aq(CentralSubstation, &[
-                (Load, &[Energized, Protected]),
-                (Line, &[Connected, Connected]),
-            ]),
-            meta_aq(SouthZone, &[
-                (Circuit, &[Energized, Protected]),
-                (Breaker, &[Nominal, Connected]),
-            ]),
+            meta_aq(
+                NorthZone,
+                &[
+                    (Circuit, &[Energized, Protected]),
+                    (Breaker, &[Nominal, Connected]),
+                ],
+            ),
+            meta_aq(
+                CentralSubstation,
+                &[
+                    (Load, &[Energized, Protected]),
+                    (Line, &[Connected, Connected]),
+                ],
+            ),
+            meta_aq(
+                SouthZone,
+                &[
+                    (Circuit, &[Energized, Protected]),
+                    (Breaker, &[Nominal, Connected]),
+                ],
+            ),
         ],
         meta_ops: vec![MetaOp::StabilizeGrid],
     }
@@ -129,22 +146,28 @@ fn plan_b() -> GridDesign {
 //   symmetry  = y_NZ+y_SZ = 5+7 = 12 ✓
 //   drift     = 3+3+2 = 8 ✓
 //   topology  = Invalid (Isolated in SouthZone → isolated circuit node) ✓
-fn plan_c() -> GridDesign {
+pub(crate) fn plan_c() -> GridDesign {
     GridDesign {
         id: "C".to_string(),
         meta_aqs: vec![
-            meta_aq(NorthZone, &[
-                (Circuit, &[Nominal, Standby]),
-                (Breaker, &[Unprotected, Idle]),
-            ]),
-            meta_aq(CentralSubstation, &[
-                (Load, &[Overloaded, Nominal]),
-                (Line, &[Standby, Idle]),
-            ]),
-            meta_aq(SouthZone, &[
-                (Circuit, &[Standby, Nominal]),
-                (Breaker, &[Standby, Isolated]), // ← topology violation
-            ]),
+            meta_aq(
+                NorthZone,
+                &[
+                    (Circuit, &[Nominal, Standby]),
+                    (Breaker, &[Unprotected, Idle]),
+                ],
+            ),
+            meta_aq(
+                CentralSubstation,
+                &[(Load, &[Overloaded, Nominal]), (Line, &[Standby, Idle])],
+            ),
+            meta_aq(
+                SouthZone,
+                &[
+                    (Circuit, &[Standby, Nominal]),
+                    (Breaker, &[Standby, Isolated]), // ← topology violation
+                ],
+            ),
         ],
         meta_ops: vec![],
     }
@@ -172,18 +195,27 @@ fn plan_d() -> GridDesign {
     GridDesign {
         id: "D".to_string(),
         meta_aqs: vec![
-            meta_aq(NorthZone, &[
-                (Circuit, &[Nominal, Nominal]),
-                (Breaker, &[Standby, Standby]),
-            ]),
-            meta_aq(CentralSubstation, &[
-                (Load, &[Energized, Protected]),
-                (Line, &[Connected, Nominal]),
-            ]),
-            meta_aq(SouthZone, &[
-                (Circuit, &[Protected, Protected]),
-                (Breaker, &[Standby, Standby]),
-            ]),
+            meta_aq(
+                NorthZone,
+                &[
+                    (Circuit, &[Nominal, Nominal]),
+                    (Breaker, &[Standby, Standby]),
+                ],
+            ),
+            meta_aq(
+                CentralSubstation,
+                &[
+                    (Load, &[Energized, Protected]),
+                    (Line, &[Connected, Nominal]),
+                ],
+            ),
+            meta_aq(
+                SouthZone,
+                &[
+                    (Circuit, &[Protected, Protected]),
+                    (Breaker, &[Standby, Standby]),
+                ],
+            ),
         ],
         meta_ops: vec![MetaOp::ShedLoad, MetaOp::BalanceZones],
     }
@@ -193,4 +225,5 @@ pub fn run_demo() -> GridTournament {
     let designs = vec![plan_a(), plan_b(), plan_c(), plan_d()];
     let mut buffer = CorrectionBuffer::new();
     run_tournament(&designs, &mut buffer)
+        .expect("canonical grid demo must contain a valid routing plan")
 }

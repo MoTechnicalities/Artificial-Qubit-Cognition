@@ -68,7 +68,8 @@ impl JointGeometricOperator for ControlledScaleOperator {
 
         let current = register.amplitudes[self.target_index] as i64;
         let updated = current * self.scale_numerator as i64 / self.scale_denominator as i64;
-        register.amplitudes[self.target_index] = updated.clamp(i32::MIN as i64, i32::MAX as i64) as i32;
+        register.amplitudes[self.target_index] =
+            updated.clamp(i32::MIN as i64, i32::MAX as i64) as i32;
     }
 }
 

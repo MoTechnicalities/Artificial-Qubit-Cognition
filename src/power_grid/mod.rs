@@ -8,8 +8,10 @@ pub mod super_aq;
 
 #[cfg(test)]
 mod tests {
-    use super::arbitration::RoutingScore;
-    use super::demo::run_demo;
+    use crate::geom::{correction_buffer::CorrectionBuffer, tournament::TournamentError};
+
+    use super::arbitration::{run_tournament, RoutingScore};
+    use super::demo::{plan_c, run_demo};
 
     #[test]
     fn plan_b_wins_tournament() {
@@ -41,13 +43,26 @@ mod tests {
         assert_eq!(find("B").score, RoutingScore::Valid(57));
         assert_eq!(find("D").score, RoutingScore::Valid(50));
         assert_eq!(find("A").stability, 30);
-        assert_eq!(find("A").symmetry,  16);
-        assert_eq!(find("A").drift,      5);
+        assert_eq!(find("A").symmetry, 16);
+        assert_eq!(find("A").drift, 5);
         assert_eq!(find("B").stability, 39);
-        assert_eq!(find("B").symmetry,  20);
-        assert_eq!(find("B").drift,      2);
+        assert_eq!(find("B").symmetry, 20);
+        assert_eq!(find("B").drift, 2);
         assert_eq!(find("D").stability, 33);
-        assert_eq!(find("D").symmetry,  14);
-        assert_eq!(find("D").drift,      3);
+        assert_eq!(find("D").symmetry, 14);
+        assert_eq!(find("D").drift, 3);
+    }
+
+    #[test]
+    fn tournament_reports_missing_and_rejected_candidate_sets() {
+        let mut buffer = CorrectionBuffer::new();
+        assert!(matches!(
+            run_tournament(&[], &mut buffer),
+            Err(TournamentError::NoCandidates)
+        ));
+        assert!(matches!(
+            run_tournament(&[plan_c()], &mut buffer),
+            Err(TournamentError::NoValidCandidates)
+        ));
     }
 }

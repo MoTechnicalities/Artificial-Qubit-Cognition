@@ -1,3 +1,9 @@
+use crate::arithmetic::{
+    checked_abs, checked_add, checked_dot, checked_matrix_vector, checked_mul, checked_sub,
+    ArithmeticError,
+};
+use crate::geom::tournament::TournamentError;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ScenarioState {
     pub situation: [i32; 3],
@@ -33,8 +39,8 @@ impl ScenarioOperator {
         }
     }
 
-    pub fn apply(&self, v: [i32; 3]) -> [i32; 3] {
-        apply_matrix(self.matrix(), v)
+    pub fn apply(&self, v: [i32; 3]) -> Result<[i32; 3], ArithmeticError> {
+        checked_matrix_vector(self.matrix(), v, "4-AQ operator application")
     }
 }
 
@@ -160,7 +166,10 @@ pub fn default_plans() -> Vec<ScenarioPlan> {
             },
             vec![
                 OperatorStep::new(ScenarioOperator::RiskAmplify, OperatorTarget::Outcome),
-                OperatorStep::new(ScenarioOperator::AlignWithValues, OperatorTarget::ActionAndOutcome),
+                OperatorStep::new(
+                    ScenarioOperator::AlignWithValues,
+                    OperatorTarget::ActionAndOutcome,
+                ),
             ],
         ),
         ScenarioPlan::new(
@@ -212,10 +221,21 @@ pub fn default_plans() -> Vec<ScenarioPlan> {
     ]
 }
 
-pub fn run_tournament(plans: &[ScenarioPlan]) -> ScenarioTournament {
-    let mut results: Vec<ScenarioResult> = plans.iter().map(evaluate_plan).collect();
+/// Runs scenario arbitration, returning [`TournamentError::NoCandidates`] for
+/// an empty plan set.
+pub fn run_tournament(plans: &[ScenarioPlan]) -> Result<ScenarioTournament, TournamentError> {
+    if plans.is_empty() {
+        return Err(TournamentError::NoCandidates);
+    }
 
-    results.sort_by(|a, b| b.score.cmp(&a.score).then_with(|| a.plan_id.cmp(&b.plan_id)));
+    let mut results: Vec<ScenarioResult> =
+        plans.iter().map(evaluate_plan).collect::<Result<_, _>>()?;
+
+    results.sort_by(|a, b| {
+        b.score
+            .cmp(&a.score)
+            .then_with(|| a.plan_id.cmp(&b.plan_id))
+    });
     let winner = results[0].clone();
 
     let tournament_signature = format!(
@@ -228,30 +248,42 @@ pub fn run_tournament(plans: &[ScenarioPlan]) -> ScenarioTournament {
             .join(">")
     );
 
-    ScenarioTournament {
+    Ok(ScenarioTournament {
         results,
         winner,
         tournament_signature,
-    }
+    })
 }
 
 pub fn run_demo() -> ScenarioTournament {
-    run_tournament(&default_plans())
+    run_tournament(&default_plans()).expect("canonical 4-AQ demo must contain plans")
 }
 
-fn evaluate_plan(plan: &ScenarioPlan) -> ScenarioResult {
+fn evaluate_plan(plan: &ScenarioPlan) -> Result<ScenarioResult, TournamentError> {
     let mut state = plan.state.clone();
     let mut op_trace: Vec<String> = Vec::with_capacity(plan.steps.len());
 
     for step in &plan.steps {
-        apply_step(&mut state, step);
+        apply_step(&mut state, step)?;
         op_trace.push(format!("{}:{}", step.operator.name(), step.target.name()));
     }
 
-    let outcome_score = dot(state.outcome, O_STABLE) - dot(state.outcome, O_HARM);
+    let outcome_score = checked_sub(
+        checked_dot(state.outcome, O_STABLE, "4-AQ stable outcome alignment")?,
+        checked_dot(state.outcome, O_HARM, "4-AQ harmful outcome alignment")?,
+        "4-AQ outcome score",
+    )?;
 
-    let agent_helpfulness = dot(state.agent, A_HELPFUL) - dot(state.agent, A_SELFISH);
-    let action_helpfulness = dot(state.action, ACT_HELP) - dot(state.action, ACT_IGNORE);
+    let agent_helpfulness = checked_sub(
+        checked_dot(state.agent, A_HELPFUL, "4-AQ helpful agent alignment")?,
+        checked_dot(state.agent, A_SELFISH, "4-AQ selfish agent alignment")?,
+        "4-AQ agent helpfulness",
+    )?;
+    let action_helpfulness = checked_sub(
+        checked_dot(state.action, ACT_HELP, "4-AQ helpful action alignment")?,
+        checked_dot(state.action, ACT_IGNORE, "4-AQ ignored action alignment")?,
+        "4-AQ action helpfulness",
+    )?;
 
     let agent_action_coherence = if agent_helpfulness > 0 && action_helpfulness > 0 {
         3
@@ -262,8 +294,11 @@ fn evaluate_plan(plan: &ScenarioPlan) -> ScenarioResult {
     };
 
     // Positive means geometrically closer to risky context, negative means closer to safe context.
-    let situation_risk = l1_distance(state.situation, S_SAFE_CONTEXT)
-        - l1_distance(state.situation, S_RISKY_CONTEXT);
+    let situation_risk = checked_sub(
+        l1_distance(state.situation, S_SAFE_CONTEXT)?,
+        l1_distance(state.situation, S_RISKY_CONTEXT)?,
+        "4-AQ situation risk",
+    )?;
     let situation_appropriateness = if situation_risk >= 0 {
         if action_helpfulness > 0 {
             11
@@ -281,11 +316,25 @@ fn evaluate_plan(plan: &ScenarioPlan) -> ScenarioResult {
     let beta = 2;
     let gamma = 3;
 
-    let score = (alpha * outcome_score)
-        + (beta * agent_action_coherence)
-        + (gamma * situation_appropriateness);
+    let score = checked_add(
+        checked_add(
+            checked_mul(alpha, outcome_score, "4-AQ weighted outcome score")?,
+            checked_mul(
+                beta,
+                agent_action_coherence,
+                "4-AQ weighted coherence score",
+            )?,
+            "4-AQ partial utility score",
+        )?,
+        checked_mul(
+            gamma,
+            situation_appropriateness,
+            "4-AQ weighted appropriateness score",
+        )?,
+        "4-AQ total utility score",
+    )?;
 
-    let action_intensity = l1_norm(state.action);
+    let action_intensity = l1_norm(state.action)?;
     let label = if situation_risk < 0 && action_helpfulness > 0 && action_intensity >= 10 {
         ScenarioLabel::Overkill
     } else if score >= 30 {
@@ -327,51 +376,52 @@ fn evaluate_plan(plan: &ScenarioPlan) -> ScenarioResult {
         trajectory_signature
     );
 
-    ScenarioResult {
+    Ok(ScenarioResult {
         plan_id: plan.id.clone(),
         description: plan.description.clone(),
         label,
         score,
         trajectory_signature,
         signature,
-    }
+    })
 }
 
-fn apply_step(state: &mut ScenarioState, step: &OperatorStep) {
+fn apply_step(state: &mut ScenarioState, step: &OperatorStep) -> Result<(), ArithmeticError> {
     match step.target {
-        OperatorTarget::Situation => state.situation = step.operator.apply(state.situation),
-        OperatorTarget::Agent => state.agent = step.operator.apply(state.agent),
-        OperatorTarget::Action => state.action = step.operator.apply(state.action),
-        OperatorTarget::Outcome => state.outcome = step.operator.apply(state.outcome),
+        OperatorTarget::Situation => state.situation = step.operator.apply(state.situation)?,
+        OperatorTarget::Agent => state.agent = step.operator.apply(state.agent)?,
+        OperatorTarget::Action => state.action = step.operator.apply(state.action)?,
+        OperatorTarget::Outcome => state.outcome = step.operator.apply(state.outcome)?,
         OperatorTarget::AgentAndAction => {
-            state.agent = step.operator.apply(state.agent);
-            state.action = step.operator.apply(state.action);
+            state.agent = step.operator.apply(state.agent)?;
+            state.action = step.operator.apply(state.action)?;
         }
         OperatorTarget::ActionAndOutcome => {
-            state.action = step.operator.apply(state.action);
-            state.outcome = step.operator.apply(state.outcome);
+            state.action = step.operator.apply(state.action)?;
+            state.outcome = step.operator.apply(state.outcome)?;
         }
     }
+    Ok(())
 }
 
-fn apply_matrix(m: [[i32; 3]; 3], v: [i32; 3]) -> [i32; 3] {
-    [
-        (m[0][0] * v[0]) + (m[0][1] * v[1]) + (m[0][2] * v[2]),
-        (m[1][0] * v[0]) + (m[1][1] * v[1]) + (m[1][2] * v[2]),
-        (m[2][0] * v[0]) + (m[2][1] * v[1]) + (m[2][2] * v[2]),
-    ]
+fn l1_norm(v: [i32; 3]) -> Result<i32, ArithmeticError> {
+    checked_add(
+        checked_add(
+            checked_abs(v[0], "4-AQ L1 norm")?,
+            checked_abs(v[1], "4-AQ L1 norm")?,
+            "4-AQ L1 norm",
+        )?,
+        checked_abs(v[2], "4-AQ L1 norm")?,
+        "4-AQ L1 norm",
+    )
 }
 
-fn dot(a: [i32; 3], b: [i32; 3]) -> i32 {
-    (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
-}
-
-fn l1_norm(v: [i32; 3]) -> i32 {
-    v[0].abs() + v[1].abs() + v[2].abs()
-}
-
-fn l1_distance(a: [i32; 3], b: [i32; 3]) -> i32 {
-    (a[0] - b[0]).abs() + (a[1] - b[1]).abs() + (a[2] - b[2]).abs()
+fn l1_distance(a: [i32; 3], b: [i32; 3]) -> Result<i32, ArithmeticError> {
+    l1_norm([
+        checked_sub(a[0], b[0], "4-AQ L1 distance")?,
+        checked_sub(a[1], b[1], "4-AQ L1 distance")?,
+        checked_sub(a[2], b[2], "4-AQ L1 distance")?,
+    ])
 }
 
 #[cfg(test)]
@@ -405,5 +455,30 @@ mod tests {
 
         assert_eq!(first.tournament_signature, second.tournament_signature);
         assert_eq!(first.results, second.results);
+    }
+
+    #[test]
+    fn empty_tournament_returns_an_error() {
+        assert_eq!(run_tournament(&[]), Err(TournamentError::NoCandidates));
+    }
+
+    #[test]
+    fn arithmetic_overflow_returns_an_error() {
+        let plans = vec![ScenarioPlan::new(
+            "overflow",
+            "overflow",
+            ScenarioState {
+                situation: [i32::MIN, 0, 0],
+                agent: A_HELPFUL,
+                action: ACT_HELP,
+                outcome: O_STABLE,
+            },
+            vec![],
+        )];
+
+        assert!(matches!(
+            run_tournament(&plans),
+            Err(TournamentError::Arithmetic(ArithmeticError::Overflow(_)))
+        ));
     }
 }

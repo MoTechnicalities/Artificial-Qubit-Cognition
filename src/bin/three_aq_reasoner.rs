@@ -23,7 +23,8 @@ fn main() {
         ),
     ];
 
-    let result = run_triadic_tournament(&scenario, &candidates);
+    let result = run_triadic_tournament(&scenario, &candidates)
+        .expect("canonical 3-AQ demo must contain candidates");
 
     println!("3-AQ Deterministic Relational Reasoner");
     for evaluation in &result.evaluations {

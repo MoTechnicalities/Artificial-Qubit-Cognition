@@ -4,7 +4,8 @@ use artificial_qubit_cognition::geom::semantic_comparator::{
 };
 
 fn run_pair(dog: &SemanticState, other: &SemanticState) {
-    let baseline = compare_semantic_states(dog.clone(), other.clone(), &[], &[]);
+    let baseline = compare_semantic_states(dog.clone(), other.clone(), &[], &[])
+        .expect("canonical animal comparison must be in range");
     println!(
         "SemanticRelation({}, {}) baseline = {}",
         dog.name,
@@ -18,7 +19,8 @@ fn run_pair(dog: &SemanticState, other: &SemanticState) {
         other.clone(),
         &[],
         &[GovernedOperator::Contrast],
-    );
+    )
+    .expect("canonical animal contrast must be in range");
     println!(
         "SemanticRelation({}, {}) after Contrast = {}",
         dog.name,
@@ -30,13 +32,9 @@ fn run_pair(dog: &SemanticState, other: &SemanticState) {
 }
 
 fn run_hierarchical_pair(left: &SemanticState, right: &SemanticState, hierarchy: &IsAHierarchy) {
-    let result = compare_semantic_states_with_hierarchy(
-        left.clone(),
-        right.clone(),
-        &[],
-        &[],
-        hierarchy,
-    );
+    let result =
+        compare_semantic_states_with_hierarchy(left.clone(), right.clone(), &[], &[], hierarchy)
+            .expect("canonical hierarchy comparison must be in range");
 
     println!(
         "TypedRelation({}, {}) = {}",
@@ -72,7 +70,11 @@ fn main() {
     let analogy_true = compare_is_a_analogy("LION", "CAT", "WOLF", "DOG", &hierarchy);
     println!(
         "IsAAnalogy(LION:CAT :: WOLF:DOG) = {}",
-        if analogy_true.analogous { "Analogous" } else { "NotAnalogous" }
+        if analogy_true.analogous {
+            "Analogous"
+        } else {
+            "NotAnalogous"
+        }
     );
     println!("Analogy signature: {}", analogy_true.analogy_signature);
 

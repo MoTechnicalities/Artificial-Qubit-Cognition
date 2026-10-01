@@ -18,7 +18,8 @@ impl CorrectionBuffer {
 
     /// Archive a validated plan as a correction candidate.
     pub fn archive(&mut self, plan_id: &str, signature: &str) {
-        self.entries.push((plan_id.to_string(), signature.to_string()));
+        self.entries
+            .push((plan_id.to_string(), signature.to_string()));
     }
 
     pub fn len(&self) -> usize {
@@ -31,6 +32,8 @@ impl CorrectionBuffer {
 
     /// Returns the most recently archived entry (LIFO fallback heuristic).
     pub fn fallback(&self) -> Option<(&str, &str)> {
-        self.entries.last().map(|(id, sig)| (id.as_str(), sig.as_str()))
+        self.entries
+            .last()
+            .map(|(id, sig)| (id.as_str(), sig.as_str()))
     }
 }

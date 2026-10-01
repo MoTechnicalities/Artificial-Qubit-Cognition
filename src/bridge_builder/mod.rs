@@ -8,8 +8,10 @@ pub mod super_aq;
 
 #[cfg(test)]
 mod tests {
-    use super::arbitration::DesignScore;
-    use super::demo::run_demo;
+    use crate::geom::{correction_buffer::CorrectionBuffer, tournament::TournamentError};
+
+    use super::arbitration::{run_tournament, DesignScore};
+    use super::demo::{design_c, run_demo};
 
     #[test]
     fn design_b_wins_tournament() {
@@ -46,13 +48,26 @@ mod tests {
         assert_eq!(find("D").score, DesignScore::Valid(50));
         // A, B, D intermediate values
         assert_eq!(find("A").stability, 32);
-        assert_eq!(find("A").symmetry,  18);
-        assert_eq!(find("A").drift,      4);
+        assert_eq!(find("A").symmetry, 18);
+        assert_eq!(find("A").drift, 4);
         assert_eq!(find("B").stability, 41);
-        assert_eq!(find("B").symmetry,  22);
-        assert_eq!(find("B").drift,      1);
+        assert_eq!(find("B").symmetry, 22);
+        assert_eq!(find("B").drift, 1);
         assert_eq!(find("D").stability, 35);
-        assert_eq!(find("D").symmetry,  12);
-        assert_eq!(find("D").drift,      3);
+        assert_eq!(find("D").symmetry, 12);
+        assert_eq!(find("D").drift, 3);
+    }
+
+    #[test]
+    fn tournament_reports_missing_and_rejected_candidate_sets() {
+        let mut buffer = CorrectionBuffer::new();
+        assert!(matches!(
+            run_tournament(&[], &mut buffer),
+            Err(TournamentError::NoCandidates)
+        ));
+        assert!(matches!(
+            run_tournament(&[design_c()], &mut buffer),
+            Err(TournamentError::NoValidCandidates)
+        ));
     }
 }

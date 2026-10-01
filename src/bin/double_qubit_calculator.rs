@@ -14,7 +14,10 @@ fn main() {
     let mut register = DoubleQubitRegister::new();
 
     println!("Double Qubit Scientific Calculator");
-    println!("Initial Register: {}", format_readout(register.read_registers()));
+    println!(
+        "Initial Register: {}",
+        format_readout(register.read_registers())
+    );
 
     PrimarySuperpositionOperator.execute(&mut register);
     println!(

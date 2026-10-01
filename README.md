@@ -260,6 +260,31 @@ This enables:
 
 The key property is that parallelism increases expressiveness while preserving closure, determinism, and auditability.
 
+## Bounded Creativity Invariant
+
+AQC defines creativity as lawful deviation from expected trajectories, not as randomness. Let $\Gamma_p$ be the primary invariants, $\Pi$ a non-empty set of canonical operator trajectories, $L_{valid}$ the language of structurally valid trajectories, and $\delta_{min} > 0$ the minimum meaningful deviation. Then:
+
+$$
+\gamma_{creativity}(\tau) =
+\left(\bigwedge_{\gamma \in \Gamma_p} \gamma(\tau)\right)
+\land (\tau \in L_{valid})
+\land \left(\min_{\pi \in \Pi} d(\tau, \pi) \ge \delta_{min}\right)
+$$
+
+The implementation uses deterministic Levenshtein distance over governed operator sequences. This distinguishes three outcomes:
+
+- `Creative`: primary invariants and structural validity hold, and deviation reaches the threshold.
+- `Routine`: validity holds, but deviation remains below the threshold.
+- `Invalid`: a primary invariant or structural rule fails, regardless of distance.
+
+`CreativityPolicy` defines $\Pi$ and $\delta_{min}$, while each reasoner supplies a domain-owned `CreativityGate` that evaluates its primary and structural invariants. Callers do not pass raw validity booleans. `CreativityEvaluation` is policy-constructed, exposes read-only verdicts, and emits a canonical audit tag. `SelectionWeights` implements the deterministic arbitration functional
+
+$$
+score(\tau) = \alpha\,utility(\tau) + \beta\,creativity(\tau).
+$$
+
+Invalid trajectories always receive zero creativity contribution. Weighted utility and creativity operations are checked; an out-of-range result returns `ArithmeticError` rather than wrapping or changing behavior between debug and release builds. The 3-AQ reasoner exposes `run_creative_triadic_tournament` as an opt-in creativity-weighted mode; the existing `run_triadic_tournament` remains utility-only. `Operator3AQ::AxisFlip` is explicitly tagged as a member of the creative-deviation operator subset $T_c$.
+
 ## 3-AQ Deterministic Relational Reasoner Demo
 
 This demo is an easy-to-construct but significantly more expressive example than the calculators. It demonstrates how three AQs can represent:

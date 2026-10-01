@@ -1,3 +1,5 @@
+use crate::arithmetic::{checked_add, checked_sub, ArithmeticError};
+
 /// A resonance field state in Z^3.
 ///
 /// The field is itself a cognitive object (recursive resonance): it can be
@@ -51,7 +53,41 @@ pub struct ResonanceScore {
 
 impl ResonanceScore {
     /// `score = stability + symmetry - drift + structural_coherence`
-    pub fn total_score(&self) -> i32 {
-        self.stability + self.symmetry - self.drift + self.structural_coherence
+    pub fn total_score(&self) -> Result<i32, ArithmeticError> {
+        let positive = checked_add(
+            self.stability,
+            self.symmetry,
+            "resonance stability and symmetry",
+        )?;
+        let after_drift = checked_sub(positive, self.drift, "resonance drift penalty")?;
+        checked_add(
+            after_drift,
+            self.structural_coherence,
+            "resonance total score",
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::arithmetic::ArithmeticError;
+
+    use super::ResonanceScore;
+
+    #[test]
+    fn total_score_reports_overflow() {
+        let score = ResonanceScore {
+            stability: i32::MAX,
+            symmetry: 1,
+            drift: 0,
+            structural_coherence: 0,
+        };
+
+        assert_eq!(
+            score.total_score(),
+            Err(ArithmeticError::Overflow(
+                "resonance stability and symmetry"
+            ))
+        );
     }
 }

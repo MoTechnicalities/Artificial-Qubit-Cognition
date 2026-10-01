@@ -4,9 +4,8 @@ use crate::bridge_builder::{
     operators::meta_ops::MetaOp,
 };
 use crate::geom::{
-    correction_buffer::CorrectionBuffer,
-    resonance_field::ResonanceField,
-    topology_gate::TopologyStatus,
+    correction_buffer::CorrectionBuffer, resonance_field::ResonanceField,
+    topology_gate::TopologyStatus, tournament::TournamentError,
 };
 
 /// Score variant for a design result.
@@ -53,14 +52,23 @@ pub struct Tournament {
 /// 4. Archive valid designs to the correction buffer.
 ///
 /// Selects the winner as the valid design with the highest total score.
-pub fn run_tournament(designs: &[BridgeDesign], buffer: &mut CorrectionBuffer) -> Tournament {
+/// Returns [`TournamentError::NoCandidates`] for an empty field or
+/// [`TournamentError::NoValidCandidates`] when topology rejects every design.
+pub fn run_tournament(
+    designs: &[BridgeDesign],
+    buffer: &mut CorrectionBuffer,
+) -> Result<Tournament, TournamentError> {
+    if designs.is_empty() {
+        return Err(TournamentError::NoCandidates);
+    }
+
     let field = ResonanceField::default_field();
 
     // Evaluate in original design order (preserves A→B→C→D ordering for signature).
     let results_ordered: Vec<DesignResult> = designs
         .iter()
         .map(|d| evaluate_design(d, &field, buffer))
-        .collect();
+        .collect::<Result<_, _>>()?;
 
     // Build tournament signature from original order before sorting.
     let plan_summary = results_ordered
@@ -84,25 +92,28 @@ pub fn run_tournament(designs: &[BridgeDesign], buffer: &mut CorrectionBuffer) -
     let winner = results
         .iter()
         .find(|r| r.score != DesignScore::Rejected)
-        .expect("at least one valid design required")
+        .ok_or(TournamentError::NoValidCandidates)?
         .clone();
 
-    let tournament_signature =
-        format!("bridge:metaAQ|winner:{}|{}", winner.id, plan_summary);
+    let tournament_signature = format!("bridge:metaAQ|winner:{}|{}", winner.id, plan_summary);
 
-    Tournament { results, winner, tournament_signature }
+    Ok(Tournament {
+        results,
+        winner,
+        tournament_signature,
+    })
 }
 
 fn evaluate_design(
     design: &BridgeDesign,
     field: &ResonanceField,
     buffer: &mut CorrectionBuffer,
-) -> DesignResult {
+) -> Result<DesignResult, TournamentError> {
     let topology = check_topology(&design.meta_aqs);
-    let scores = evaluate_resonance(field, &design.meta_aqs, &design.meta_ops);
+    let scores = evaluate_resonance(field, &design.meta_aqs, &design.meta_ops)?;
 
     let (score, signature) = if topology.is_valid() {
-        let total = scores.total_score();
+        let total = scores.total_score()?;
         let label = if total >= 60 {
             "HighPerformance"
         } else if total >= 45 {
@@ -112,20 +123,22 @@ fn evaluate_design(
         };
         let sig = format!(
             "design:{}|label:{}|score:{}|stab:{}|sym:{}|drift:{}|coherence:{}",
-            design.id, label, total,
-            scores.stability, scores.symmetry, scores.drift, scores.structural_coherence
+            design.id,
+            label,
+            total,
+            scores.stability,
+            scores.symmetry,
+            scores.drift,
+            scores.structural_coherence
         );
         buffer.archive(&design.id, &sig);
         (DesignScore::Valid(total), sig)
     } else {
-        let sig = format!(
-            "design:{}|label:Rejected|topology:invalid",
-            design.id
-        );
+        let sig = format!("design:{}|label:Rejected|topology:invalid", design.id);
         (DesignScore::Rejected, sig)
     };
 
-    DesignResult {
+    Ok(DesignResult {
         id: design.id.clone(),
         stability: scores.stability,
         symmetry: scores.symmetry,
@@ -133,5 +146,5 @@ fn evaluate_design(
         topology,
         score,
         signature,
-    }
+    })
 }

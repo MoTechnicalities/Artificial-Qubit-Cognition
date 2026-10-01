@@ -19,6 +19,7 @@ fn paq(kind: PrimitiveAQKind) -> PrimitiveAQ {
 
 fn super_aq(kind: SuperAQKind, ks: &[PrimitiveAQKind]) -> SuperAQ {
     SuperAQ::new(kind, ks.iter().map(|&k| paq(k)).collect())
+        .expect("canonical bridge super-AQ coordinates must be in range")
 }
 
 fn meta_aq(kind: MetaAQKind, parts: &[(SuperAQKind, &[PrimitiveAQKind])]) -> MetaAQ {
@@ -26,6 +27,7 @@ fn meta_aq(kind: MetaAQKind, parts: &[(SuperAQKind, &[PrimitiveAQKind])]) -> Met
         kind,
         parts.iter().map(|&(sk, ps)| super_aq(sk, ps)).collect(),
     )
+    .expect("canonical bridge meta-AQ coordinates must be in range")
 }
 
 // ── Design A: Standard Truss ──────────────────────────────────────────────
@@ -46,18 +48,27 @@ fn design_a() -> BridgeDesign {
     BridgeDesign {
         id: "A".to_string(),
         meta_aqs: vec![
-            meta_aq(LeftSpan, &[
-                (Beam,  &[Stable, Aligned]),
-                (Joint, &[Connected, NonLoadBearing]),
-            ]),
-            meta_aq(CentralSupport, &[
-                (Support, &[Misaligned, NonLoadBearing]),
-                (Span,    &[Misaligned, NonLoadBearing]),
-            ]),
-            meta_aq(RightSpan, &[
-                (Beam,  &[Stable, Aligned]),
-                (Joint, &[Connected, NonLoadBearing]),
-            ]),
+            meta_aq(
+                LeftSpan,
+                &[
+                    (Beam, &[Stable, Aligned]),
+                    (Joint, &[Connected, NonLoadBearing]),
+                ],
+            ),
+            meta_aq(
+                CentralSupport,
+                &[
+                    (Support, &[Misaligned, NonLoadBearing]),
+                    (Span, &[Misaligned, NonLoadBearing]),
+                ],
+            ),
+            meta_aq(
+                RightSpan,
+                &[
+                    (Beam, &[Stable, Aligned]),
+                    (Joint, &[Connected, NonLoadBearing]),
+                ],
+            ),
         ],
         meta_ops: vec![MetaOp::BalanceSpans],
     }
@@ -81,18 +92,21 @@ fn design_b() -> BridgeDesign {
     BridgeDesign {
         id: "B".to_string(),
         meta_aqs: vec![
-            meta_aq(LeftSpan, &[
-                (Beam,  &[Stable, Stable]),
-                (Joint, &[Aligned, Connected]),
-            ]),
-            meta_aq(CentralSupport, &[
-                (Support, &[Stable, Aligned]),
-                (Span,    &[Connected, LoadBearing]),
-            ]),
-            meta_aq(RightSpan, &[
-                (Beam,  &[Stable, Stable]),
-                (Joint, &[Aligned, Connected]),
-            ]),
+            meta_aq(
+                LeftSpan,
+                &[(Beam, &[Stable, Stable]), (Joint, &[Aligned, Connected])],
+            ),
+            meta_aq(
+                CentralSupport,
+                &[
+                    (Support, &[Stable, Aligned]),
+                    (Span, &[Connected, LoadBearing]),
+                ],
+            ),
+            meta_aq(
+                RightSpan,
+                &[(Beam, &[Stable, Stable]), (Joint, &[Aligned, Connected])],
+            ),
         ],
         meta_ops: vec![MetaOp::StabilizeBridge],
     }
@@ -112,22 +126,31 @@ fn design_b() -> BridgeDesign {
 //   symmetry  = 4+6     = 10 ✓
 //   drift     = 4+0+3   = 7  ✓
 //   topology  = Invalid (Disconnected in RightSpan → unsupported span) ✓
-fn design_c() -> BridgeDesign {
+pub(crate) fn design_c() -> BridgeDesign {
     BridgeDesign {
         id: "C".to_string(),
         meta_aqs: vec![
-            meta_aq(LeftSpan, &[
-                (Beam,  &[NonLoadBearing, Misaligned]),
-                (Joint, &[Misaligned, NonLoadBearing]),
-            ]),
-            meta_aq(CentralSupport, &[
-                (Support, &[Stable, Aligned]),
-                (Span,    &[Connected, Connected]),
-            ]),
-            meta_aq(RightSpan, &[
-                (Beam,  &[NonLoadBearing, Misaligned]),
-                (Joint, &[NonLoadBearing, Disconnected]), // ← topology violation
-            ]),
+            meta_aq(
+                LeftSpan,
+                &[
+                    (Beam, &[NonLoadBearing, Misaligned]),
+                    (Joint, &[Misaligned, NonLoadBearing]),
+                ],
+            ),
+            meta_aq(
+                CentralSupport,
+                &[
+                    (Support, &[Stable, Aligned]),
+                    (Span, &[Connected, Connected]),
+                ],
+            ),
+            meta_aq(
+                RightSpan,
+                &[
+                    (Beam, &[NonLoadBearing, Misaligned]),
+                    (Joint, &[NonLoadBearing, Disconnected]), // ← topology violation
+                ],
+            ),
         ],
         meta_ops: vec![],
     }
@@ -152,18 +175,24 @@ fn design_d() -> BridgeDesign {
     BridgeDesign {
         id: "D".to_string(),
         meta_aqs: vec![
-            meta_aq(LeftSpan, &[
-                (Beam,  &[Misaligned, NonLoadBearing]),
-                (Joint, &[NonLoadBearing, NonLoadBearing]),
-            ]),
-            meta_aq(CentralSupport, &[
-                (Support, &[Stable, Stable]),
-                (Span,    &[Stable, LoadBearing]),
-            ]),
-            meta_aq(RightSpan, &[
-                (Beam,  &[Stable, Stable]),
-                (Joint, &[NonLoadBearing, NonLoadBearing]),
-            ]),
+            meta_aq(
+                LeftSpan,
+                &[
+                    (Beam, &[Misaligned, NonLoadBearing]),
+                    (Joint, &[NonLoadBearing, NonLoadBearing]),
+                ],
+            ),
+            meta_aq(
+                CentralSupport,
+                &[(Support, &[Stable, Stable]), (Span, &[Stable, LoadBearing])],
+            ),
+            meta_aq(
+                RightSpan,
+                &[
+                    (Beam, &[Stable, Stable]),
+                    (Joint, &[NonLoadBearing, NonLoadBearing]),
+                ],
+            ),
         ],
         meta_ops: vec![MetaOp::DistributeLoad, MetaOp::BalanceSpans],
     }
@@ -175,4 +204,5 @@ pub fn run_demo() -> Tournament {
     let designs = vec![design_a(), design_b(), design_c(), design_d()];
     let mut buffer = CorrectionBuffer::new();
     run_tournament(&designs, &mut buffer)
+        .expect("canonical bridge demo must contain a valid design")
 }

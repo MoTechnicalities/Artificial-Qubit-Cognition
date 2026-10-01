@@ -9,8 +9,8 @@ pub enum MetaOp {
 impl MetaOp {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::BalanceSpans    => "BalanceSpans",
-            Self::DistributeLoad  => "DistributeLoad",
+            Self::BalanceSpans => "BalanceSpans",
+            Self::DistributeLoad => "DistributeLoad",
             Self::StabilizeBridge => "StabilizeBridge",
         }
     }
@@ -20,8 +20,8 @@ impl MetaOp {
     /// yielding a +6 structural coherence bonus in the resonance field.
     pub fn coherence_bonus(self) -> i32 {
         match self {
-            Self::DistributeLoad  => 6,
-            Self::BalanceSpans    => 0,
+            Self::DistributeLoad => 6,
+            Self::BalanceSpans => 0,
             Self::StabilizeBridge => 0,
         }
     }

@@ -1,7 +1,6 @@
 use crate::geom::{
-    correction_buffer::CorrectionBuffer,
-    resonance_field::ResonanceField,
-    topology_gate::TopologyStatus,
+    correction_buffer::CorrectionBuffer, resonance_field::ResonanceField,
+    topology_gate::TopologyStatus, tournament::TournamentError,
 };
 use crate::power_grid::{
     evaluation::{check_topology, evaluate_resonance},
@@ -39,16 +38,24 @@ pub struct GridTournament {
     pub tournament_signature: String,
 }
 
+/// Selects the highest-scoring valid routing plan.
+///
+/// Returns [`TournamentError::NoCandidates`] for an empty field or
+/// [`TournamentError::NoValidCandidates`] when topology rejects every plan.
 pub fn run_tournament(
     designs: &[GridDesign],
     buffer: &mut CorrectionBuffer,
-) -> GridTournament {
+) -> Result<GridTournament, TournamentError> {
+    if designs.is_empty() {
+        return Err(TournamentError::NoCandidates);
+    }
+
     let field = ResonanceField::default_field();
 
     let results_ordered: Vec<RoutingResult> = designs
         .iter()
         .map(|d| evaluate_design(d, &field, buffer))
-        .collect();
+        .collect::<Result<_, _>>()?;
 
     // Build signature from original A→B→C→D order before sorting.
     let plan_summary = results_ordered
@@ -71,25 +78,28 @@ pub fn run_tournament(
     let winner = results
         .iter()
         .find(|r| r.score != RoutingScore::Rejected)
-        .expect("at least one valid routing plan required")
+        .ok_or(TournamentError::NoValidCandidates)?
         .clone();
 
-    let tournament_signature =
-        format!("grid:metaAQ|winner:{}|{}", winner.id, plan_summary);
+    let tournament_signature = format!("grid:metaAQ|winner:{}|{}", winner.id, plan_summary);
 
-    GridTournament { results, winner, tournament_signature }
+    Ok(GridTournament {
+        results,
+        winner,
+        tournament_signature,
+    })
 }
 
 fn evaluate_design(
     design: &GridDesign,
     field: &ResonanceField,
     buffer: &mut CorrectionBuffer,
-) -> RoutingResult {
+) -> Result<RoutingResult, TournamentError> {
     let topology = check_topology(&design.meta_aqs);
-    let scores = evaluate_resonance(field, &design.meta_aqs, &design.meta_ops);
+    let scores = evaluate_resonance(field, &design.meta_aqs, &design.meta_ops)?;
 
     let (score, signature) = if topology.is_valid() {
-        let total = scores.total_score();
+        let total = scores.total_score()?;
         let label = if total >= 55 {
             "HighCapacity"
         } else if total >= 40 {
@@ -99,8 +109,13 @@ fn evaluate_design(
         };
         let sig = format!(
             "grid:{}|label:{}|score:{}|stab:{}|sym:{}|drift:{}|coherence:{}",
-            design.id, label, total,
-            scores.stability, scores.symmetry, scores.drift, scores.structural_coherence
+            design.id,
+            label,
+            total,
+            scores.stability,
+            scores.symmetry,
+            scores.drift,
+            scores.structural_coherence
         );
         buffer.archive(&design.id, &sig);
         (RoutingScore::Valid(total), sig)
@@ -109,7 +124,7 @@ fn evaluate_design(
         (RoutingScore::Rejected, sig)
     };
 
-    RoutingResult {
+    Ok(RoutingResult {
         id: design.id.clone(),
         stability: scores.stability,
         symmetry: scores.symmetry,
@@ -117,5 +132,5 @@ fn evaluate_design(
         topology,
         score,
         signature,
-    }
+    })
 }

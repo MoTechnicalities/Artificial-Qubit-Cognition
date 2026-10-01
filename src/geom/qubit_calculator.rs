@@ -14,7 +14,11 @@ pub struct CalculatorQubit {
 impl CalculatorQubit {
     /// Initialize register at logical 0.0 (north pole).
     pub fn clear() -> Self {
-        Self { x: 0, y: 0, z: SCALE }
+        Self {
+            x: 0,
+            y: 0,
+            z: SCALE,
+        }
     }
 
     /// Read the state as a decimal in the [0.0, 1.0] range.
@@ -81,7 +85,10 @@ mod tests {
     fn geometric_subtraction_0_7_minus_0_2_is_0_5() {
         let mut register = CalculatorQubit::clear();
         register = GeometricAddOperator { value_to_add: 0.7 }.execute(&register);
-        register = GeometricSubOperator { value_to_subtract: 0.2 }.execute(&register);
+        register = GeometricSubOperator {
+            value_to_subtract: 0.2,
+        }
+        .execute(&register);
         assert_eq!(register.read_value(), "0.5");
     }
 }

@@ -1,3 +1,4 @@
+use crate::arithmetic::{checked_sum, ArithmeticError};
 use crate::power_grid::primitive_aq::PrimitiveAQ;
 
 /// Super-AQ kinds for the Power Grid domain.
@@ -14,8 +15,8 @@ impl SuperAQKind {
         match self {
             Self::Circuit => "Circuit",
             Self::Breaker => "Breaker",
-            Self::Load    => "Load",
-            Self::Line    => "Line",
+            Self::Load => "Load",
+            Self::Line => "Line",
         }
     }
 }
@@ -29,14 +30,34 @@ pub struct SuperAQ {
 }
 
 impl SuperAQ {
-    pub fn new(kind: SuperAQKind, components: Vec<PrimitiveAQ>) -> Self {
-        let gestalt = components.iter().fold([0, 0, 0], |acc, p| {
-            [acc[0] + p.coords[0], acc[1] + p.coords[1], acc[2] + p.coords[2]]
-        });
+    pub fn new(kind: SuperAQKind, components: Vec<PrimitiveAQ>) -> Result<Self, ArithmeticError> {
+        let gestalt = [
+            checked_sum(
+                components.iter().map(|component| component.coords[0]),
+                "grid super-AQ drift aggregation",
+            )?,
+            checked_sum(
+                components.iter().map(|component| component.coords[1]),
+                "grid super-AQ symmetry aggregation",
+            )?,
+            checked_sum(
+                components.iter().map(|component| component.coords[2]),
+                "grid super-AQ stability aggregation",
+            )?,
+        ];
         let signature = format!(
             "superaq:{}|gestalt:[{},{},{}]|n:{}",
-            kind.as_str(), gestalt[0], gestalt[1], gestalt[2], components.len()
+            kind.as_str(),
+            gestalt[0],
+            gestalt[1],
+            gestalt[2],
+            components.len()
         );
-        Self { kind, components, gestalt, signature }
+        Ok(Self {
+            kind,
+            components,
+            gestalt,
+            signature,
+        })
     }
 }

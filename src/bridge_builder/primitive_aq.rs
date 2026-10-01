@@ -20,27 +20,27 @@ impl PrimitiveAQKind {
     pub fn canonical_coords(self) -> [i32; 3] {
         match self {
             // [drift, symmetry, stability]
-            Self::Stable         => [0, 3, 4],
-            Self::Unstable       => [3, 1, 1],
-            Self::LoadBearing    => [1, 2, 3],
+            Self::Stable => [0, 3, 4],
+            Self::Unstable => [3, 1, 1],
+            Self::LoadBearing => [1, 2, 3],
             Self::NonLoadBearing => [0, 1, 2],
-            Self::Aligned        => [0, 3, 3],
-            Self::Misaligned     => [2, 1, 2],
-            Self::Connected      => [0, 2, 3],
-            Self::Disconnected   => [1, 3, 1],
+            Self::Aligned => [0, 3, 3],
+            Self::Misaligned => [2, 1, 2],
+            Self::Connected => [0, 2, 3],
+            Self::Disconnected => [1, 3, 1],
         }
     }
 
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::Stable         => "Stable",
-            Self::Unstable       => "Unstable",
-            Self::LoadBearing    => "LoadBearing",
+            Self::Stable => "Stable",
+            Self::Unstable => "Unstable",
+            Self::LoadBearing => "LoadBearing",
             Self::NonLoadBearing => "NonLoadBearing",
-            Self::Aligned        => "Aligned",
-            Self::Misaligned     => "Misaligned",
-            Self::Connected      => "Connected",
-            Self::Disconnected   => "Disconnected",
+            Self::Aligned => "Aligned",
+            Self::Misaligned => "Misaligned",
+            Self::Connected => "Connected",
+            Self::Disconnected => "Disconnected",
         }
     }
 }
@@ -58,8 +58,15 @@ impl PrimitiveAQ {
         let coords = kind.canonical_coords();
         let signature = format!(
             "paq:{}|coords:[{},{},{}]",
-            kind.as_str(), coords[0], coords[1], coords[2]
+            kind.as_str(),
+            coords[0],
+            coords[1],
+            coords[2]
         );
-        Self { kind, coords, signature }
+        Self {
+            kind,
+            coords,
+            signature,
+        }
     }
 }

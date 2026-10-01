@@ -1,3 +1,5 @@
+use crate::creativity::{CreativityEvaluation, CreativityGate, CreativityPolicy};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ClosureStatus {
     Open,
@@ -57,15 +59,13 @@ impl ThoughtTrajectory {
 
     pub fn apply_operator(&mut self, operator: impl Into<String>) {
         let operator = operator.into();
-        self.audit_history
-            .push(format!("operator:{operator}"));
+        self.audit_history.push(format!("operator:{operator}"));
         self.operators_applied.push(operator);
     }
 
     pub fn cross_binding(&mut self, binding: impl Into<String>) {
         let binding = binding.into();
-        self.audit_history
-            .push(format!("binding:{binding}"));
+        self.audit_history.push(format!("binding:{binding}"));
         self.bindings_crossed.push(binding);
     }
 
@@ -77,6 +77,16 @@ impl ThoughtTrajectory {
 
     pub fn append_audit_event(&mut self, event: impl Into<String>) {
         self.audit_history.push(event.into());
+    }
+
+    pub fn evaluate_creativity(
+        &mut self,
+        policy: &CreativityPolicy,
+        gate: &impl CreativityGate<Self>,
+    ) -> CreativityEvaluation {
+        let evaluation = policy.evaluate(&self.operators_applied, self, gate);
+        self.append_audit_event(evaluation.canonical_tag());
+        evaluation
     }
 
     pub fn canonical_signature(&self) -> String {
@@ -109,7 +119,21 @@ impl ThoughtTrajectory {
 
 #[cfg(test)]
 mod tests {
+    use crate::creativity::{CreativityGate, CreativityPolicy};
+
     use super::{ClosureStatus, ThoughtTrajectory};
+
+    struct ClosedTrajectoryGate;
+
+    impl CreativityGate<ThoughtTrajectory> for ClosedTrajectoryGate {
+        fn primary_invariants_preserved(&self, trajectory: &ThoughtTrajectory) -> bool {
+            trajectory.closure_status() != ClosureStatus::Open
+        }
+
+        fn structurally_valid(&self, trajectory: &ThoughtTrajectory) -> bool {
+            !trajectory.origin().is_empty()
+        }
+    }
 
     #[test]
     fn trajectory_records_operator_binding_and_closure_history() {
@@ -144,5 +168,20 @@ mod tests {
             trajectory.canonical_signature(),
             "origin=origin-a|operators=contrast|bindings=dog<wolf|closure=corrected|audit=operator:contrast>binding:dog<wolf>resonance:stable>closure:corrected"
         );
+    }
+
+    #[test]
+    fn creativity_evaluation_is_recorded_in_the_audit_signature() {
+        let policy = CreativityPolicy::new(vec![vec!["abstraction".to_string()]], 1).unwrap();
+        let mut trajectory = ThoughtTrajectory::new("origin-c");
+        trajectory.apply_operator("contrast");
+        trajectory.set_closure_status(ClosureStatus::Closed);
+
+        let evaluation = trajectory.evaluate_creativity(&policy, &ClosedTrajectoryGate);
+
+        assert!(evaluation.is_creative());
+        assert!(trajectory
+            .canonical_signature()
+            .contains("creativity:creative|distance:1|minimum:1|invariants:true|structure:true"));
     }
 }

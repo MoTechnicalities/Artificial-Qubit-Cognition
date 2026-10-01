@@ -16,6 +16,12 @@ fn main() {
     // Bonus subtraction example
     let mut sub_register = CalculatorQubit::clear();
     sub_register = GeometricAddOperator { value_to_add: 0.7 }.execute(&sub_register);
-    sub_register = GeometricSubOperator { value_to_subtract: 0.2 }.execute(&sub_register);
-    println!("Subtraction Check (0.7 - 0.2): {}", sub_register.read_value());
+    sub_register = GeometricSubOperator {
+        value_to_subtract: 0.2,
+    }
+    .execute(&sub_register);
+    println!(
+        "Subtraction Check (0.7 - 0.2): {}",
+        sub_register.read_value()
+    );
 }

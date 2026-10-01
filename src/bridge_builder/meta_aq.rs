@@ -1,3 +1,4 @@
+use crate::arithmetic::{checked_sum, ArithmeticError};
 use crate::bridge_builder::super_aq::SuperAQ;
 
 /// A meta-AQ is a governed composite of super-AQs representing
@@ -12,9 +13,9 @@ pub enum MetaAQKind {
 impl MetaAQKind {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::LeftSpan       => "LeftSpan",
+            Self::LeftSpan => "LeftSpan",
             Self::CentralSupport => "CentralSupport",
-            Self::RightSpan      => "RightSpan",
+            Self::RightSpan => "RightSpan",
         }
     }
 
@@ -34,18 +35,38 @@ pub struct MetaAQ {
 }
 
 impl MetaAQ {
-    pub fn new(kind: MetaAQKind, components: Vec<SuperAQ>) -> Self {
-        let gestalt = aggregate_gestalt(&components);
+    pub fn new(kind: MetaAQKind, components: Vec<SuperAQ>) -> Result<Self, ArithmeticError> {
+        let gestalt = aggregate_gestalt(&components)?;
         let signature = format!(
             "metaaq:{}|gestalt:[{},{},{}]|n:{}",
-            kind.as_str(), gestalt[0], gestalt[1], gestalt[2], components.len()
+            kind.as_str(),
+            gestalt[0],
+            gestalt[1],
+            gestalt[2],
+            components.len()
         );
-        Self { kind, components, gestalt, signature }
+        Ok(Self {
+            kind,
+            components,
+            gestalt,
+            signature,
+        })
     }
 }
 
-fn aggregate_gestalt(components: &[SuperAQ]) -> [i32; 3] {
-    components.iter().fold([0, 0, 0], |acc, s| {
-        [acc[0] + s.gestalt[0], acc[1] + s.gestalt[1], acc[2] + s.gestalt[2]]
-    })
+fn aggregate_gestalt(components: &[SuperAQ]) -> Result<[i32; 3], ArithmeticError> {
+    Ok([
+        checked_sum(
+            components.iter().map(|component| component.gestalt[0]),
+            "bridge meta-AQ drift aggregation",
+        )?,
+        checked_sum(
+            components.iter().map(|component| component.gestalt[1]),
+            "bridge meta-AQ symmetry aggregation",
+        )?,
+        checked_sum(
+            components.iter().map(|component| component.gestalt[2]),
+            "bridge meta-AQ stability aggregation",
+        )?,
+    ])
 }

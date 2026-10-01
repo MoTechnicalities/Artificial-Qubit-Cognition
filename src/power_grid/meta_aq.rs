@@ -1,3 +1,4 @@
+use crate::arithmetic::{checked_sum, ArithmeticError};
 use crate::power_grid::super_aq::SuperAQ;
 
 /// Meta-AQ kinds for the Power Grid domain.
@@ -11,9 +12,9 @@ pub enum MetaAQKind {
 impl MetaAQKind {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::NorthZone         => "NorthZone",
+            Self::NorthZone => "NorthZone",
             Self::CentralSubstation => "CentralSubstation",
-            Self::SouthZone         => "SouthZone",
+            Self::SouthZone => "SouthZone",
         }
     }
 
@@ -32,14 +33,34 @@ pub struct MetaAQ {
 }
 
 impl MetaAQ {
-    pub fn new(kind: MetaAQKind, components: Vec<SuperAQ>) -> Self {
-        let gestalt = components.iter().fold([0, 0, 0], |acc, s| {
-            [acc[0] + s.gestalt[0], acc[1] + s.gestalt[1], acc[2] + s.gestalt[2]]
-        });
+    pub fn new(kind: MetaAQKind, components: Vec<SuperAQ>) -> Result<Self, ArithmeticError> {
+        let gestalt = [
+            checked_sum(
+                components.iter().map(|component| component.gestalt[0]),
+                "grid meta-AQ drift aggregation",
+            )?,
+            checked_sum(
+                components.iter().map(|component| component.gestalt[1]),
+                "grid meta-AQ symmetry aggregation",
+            )?,
+            checked_sum(
+                components.iter().map(|component| component.gestalt[2]),
+                "grid meta-AQ stability aggregation",
+            )?,
+        ];
         let signature = format!(
             "metaaq:{}|gestalt:[{},{},{}]|n:{}",
-            kind.as_str(), gestalt[0], gestalt[1], gestalt[2], components.len()
+            kind.as_str(),
+            gestalt[0],
+            gestalt[1],
+            gestalt[2],
+            components.len()
         );
-        Self { kind, components, gestalt, signature }
+        Ok(Self {
+            kind,
+            components,
+            gestalt,
+            signature,
+        })
     }
 }

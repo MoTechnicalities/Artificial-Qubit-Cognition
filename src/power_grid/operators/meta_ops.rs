@@ -9,9 +9,9 @@ pub enum MetaOp {
 impl MetaOp {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::BalanceZones   => "BalanceZones",
-            Self::ShedLoad       => "ShedLoad",
-            Self::StabilizeGrid  => "StabilizeGrid",
+            Self::BalanceZones => "BalanceZones",
+            Self::ShedLoad => "ShedLoad",
+            Self::StabilizeGrid => "StabilizeGrid",
         }
     }
 
@@ -20,8 +20,8 @@ impl MetaOp {
     /// across zones, creating a globally coherent routing geometry.
     pub fn coherence_bonus(self) -> i32 {
         match self {
-            Self::ShedLoad      => 6,
-            Self::BalanceZones  => 0,
+            Self::ShedLoad => 6,
+            Self::BalanceZones => 0,
             Self::StabilizeGrid => 0,
         }
     }
